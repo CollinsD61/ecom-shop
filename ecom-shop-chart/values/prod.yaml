@@ -1,0 +1,278 @@
+nameOverride: ""
+fullnameOverride: ""
+
+imagePullSecrets: []
+
+# External Secrets Operator integration for AWS Secrets Manager
+externalSecrets:
+  enabled: true
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: aws-secretsmanager
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+    # Cognito auth on ALB (fill with real values)
+    alb.ingress.kubernetes.io/auth-type: cognito
+    alb.ingress.kubernetes.io/auth-idp-cognito: '{"userPoolARN":"arn:aws:cognito-idp:ap-southeast-1:123456789012:userpool/ap-southeast-1_xxxxx","userPoolClientID":"xxxxxxxxxxxxxxxxxxxxxxxxxx","userPoolDomain":"your-cognito-domain"}'
+    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
+    alb.ingress.kubernetes.io/auth-scope: openid
+  hosts:
+    - host: shop.dohoangdevops.io.vn
+      paths:
+        - path: /api/user
+          pathType: Prefix
+          service: user-service
+        - path: /api/product
+          pathType: Prefix
+          service: product-service
+        - path: /api/shopping-cart
+          pathType: Prefix
+          service: shopping-cart-service
+  tls: []
+
+# Optional Gateway API HTTPRoute support (disabled by default)
+httpRoute:
+  enabled: false
+  annotations: {}
+  parentRefs:
+    - name: gateway
+      sectionName: http
+  hostnames:
+    - chart-example.local
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/user
+      backendService: user-service
+
+services:
+  user-service:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/user-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    containerPort: 5865
+    service:
+      type: ClusterIP
+      port: 5865
+    serviceAccount:
+      create: true
+      automount: true
+      name: ""
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/sa-user-service-role
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+    securityContext: {}
+    env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: prod
+    envFromSecrets:
+      - user-service-secret
+    resources: {}
+    livenessProbe:
+      httpGet:
+        path: /actuator/health
+        port: http
+      initialDelaySeconds: 20
+      periodSeconds: 15
+    readinessProbe:
+      httpGet:
+        path: /actuator/health
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 80
+    volumes: []
+    volumeMounts: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    externalSecret:
+      enabled: true
+      refreshInterval: 1h
+      targetSecretName: user-service-secret
+      secretStoreRef:
+        kind: ClusterSecretStore
+        name: aws-secretsmanager
+      data:
+        - secretKey: SPRING_DATASOURCE_URL
+          remoteRef:
+            key: /ecom/prod/user-service/db
+            property: jdbc_url
+        - secretKey: SPRING_DATASOURCE_USERNAME
+          remoteRef:
+            key: /ecom/prod/user-service/db
+            property: username
+        - secretKey: SPRING_DATASOURCE_PASSWORD
+          remoteRef:
+            key: /ecom/prod/user-service/db
+            property: password
+        - secretKey: COGNITO_HOSTED_UI_LOGIN_URL
+          remoteRef:
+            key: /ecom/prod/user-service/cognito
+            property: hosted_ui_login_url
+        - secretKey: COGNITO_HOSTED_UI_SIGNUP_URL
+          remoteRef:
+            key: /ecom/prod/user-service/cognito
+            property: hosted_ui_signup_url
+
+  product-service:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/product-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    containerPort: 5861
+    service:
+      type: ClusterIP
+      port: 5861
+    serviceAccount:
+      create: true
+      automount: true
+      name: ""
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/sa-product-service-role
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+    securityContext: {}
+    env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: prod
+    envFromSecrets:
+      - product-service-secret
+    resources: {}
+    livenessProbe:
+      httpGet:
+        path: /actuator/health
+        port: http
+      initialDelaySeconds: 20
+      periodSeconds: 15
+    readinessProbe:
+      httpGet:
+        path: /actuator/health
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 80
+    volumes: []
+    volumeMounts: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    externalSecret:
+      enabled: true
+      refreshInterval: 1h
+      targetSecretName: product-service-secret
+      secretStoreRef:
+        kind: ClusterSecretStore
+        name: aws-secretsmanager
+      data:
+        - secretKey: SPRING_DATASOURCE_URL
+          remoteRef:
+            key: /ecom/prod/product-service/db
+            property: jdbc_url
+        - secretKey: SPRING_DATASOURCE_USERNAME
+          remoteRef:
+            key: /ecom/prod/product-service/db
+            property: username
+        - secretKey: SPRING_DATASOURCE_PASSWORD
+          remoteRef:
+            key: /ecom/prod/product-service/db
+            property: password
+
+  shopping-cart-service:
+    enabled: true
+    replicaCount: 2
+    image:
+      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/shopping-cart-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    containerPort: 5863
+    service:
+      type: ClusterIP
+      port: 5863
+    serviceAccount:
+      create: true
+      automount: true
+      name: ""
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/sa-shopping-cart-service-role
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+    securityContext: {}
+    env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: prod
+    envFromSecrets:
+      - shopping-cart-service-secret
+    resources: {}
+    livenessProbe:
+      httpGet:
+        path: /actuator/health
+        port: http
+      initialDelaySeconds: 20
+      periodSeconds: 15
+    readinessProbe:
+      httpGet:
+        path: /actuator/health
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 80
+    volumes: []
+    volumeMounts: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    externalSecret:
+      enabled: true
+      refreshInterval: 1h
+      targetSecretName: shopping-cart-service-secret
+      secretStoreRef:
+        kind: ClusterSecretStore
+        name: aws-secretsmanager
+      data:
+        - secretKey: SPRING_DATASOURCE_URL
+          remoteRef:
+            key: /ecom/prod/shopping-cart-service/db
+            property: jdbc_url
+        - secretKey: SPRING_DATASOURCE_USERNAME
+          remoteRef:
+            key: /ecom/prod/shopping-cart-service/db
+            property: username
+        - secretKey: SPRING_DATASOURCE_PASSWORD
+          remoteRef:
+            key: /ecom/prod/shopping-cart-service/db
+            property: password

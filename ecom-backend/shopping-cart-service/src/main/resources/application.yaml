@@ -1,0 +1,33 @@
+spring:
+ application:
+  name: shopping-cart-service
+
+ profiles:
+  active: localhost
+
+server:
+ port: 5863
+ 
+---
+spring:
+ config:
+  activate:
+   on-profile: localhost
+ cloud:
+  config: 
+   uri: http://config-server:5859
+   
+---
+spring:
+ datasource: 
+  url: jdbc:postgresql://192.168.1.110:5432/postgres?useSSL=false
+  username: postgres
+  password: admin
+ jpa:
+  hibernate:
+   ddl-auto: update
+  show-sql: true
+  properties: 
+   hibernate:
+    format-sql: true
+  
