@@ -4,19 +4,21 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { withRouter } from '../common/WithRouter';
 import { updateProduct } from "../actions/products";
-import { Card, ListGroup, Modal } from "react-bootstrap";
+import { Card, Modal } from "react-bootstrap";
 import cartService from "../services/CartService";
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
+
 import { Add, Inventory2Sharp, ShoppingCartRounded } from "@mui/icons-material";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ProductsList = () => {
     const [products, setProducts] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     const [cartProducts, setCartProducts] = useState([]);
     const [currentProduct, setCurrentProduct] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [totalPrice, setTotalPrice] = useState("");
     const [cartId, setCartId] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -80,6 +82,7 @@ const ProductsList = () => {
     useEffect(retrieveProducts, []);
     useEffect(() => {
         retrieveCart();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const refreshList = () => {
@@ -139,6 +142,7 @@ const ProductsList = () => {
         handleCloseModal();
     };
 
+    // eslint-disable-next-line no-unused-vars
     const removeProductFromCart = (product) => {
         cartService.deleteProduct(cartId, product.id)
             .then((response) => {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import { Container, Navbar, Nav, Form, FormControl, Button } from "react-bootstrap";
+import { Container, Navbar, Form, FormControl, Button } from "react-bootstrap";
 import { Search, ShoppingCart, Notifications, Help, Language } from "@mui/icons-material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -21,7 +21,6 @@ import { history } from './helpers/history';
 
 import AuthVerify from "./common/AuthVerify";
 import EventBus from "./common/EventBus";
-import { Login, Logout, Person, PersonAdd } from "@mui/icons-material";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProfileEditComponent from "./components/ProfileEditComponent";
@@ -225,23 +224,23 @@ class App extends Component {
       <>
         {/* Inject CSS */}
         <style>{appStyle}</style>
-        <div class="header-container">
+        <div className="header-container">
         {/* Header Top */}
         <div className="header-top">
           <div>
-            <a href="https://devopsedu.vn/" target="_blank">Kênh bản quyền</a>
-            <a href="https://devopsedu.vn/contact/" target="_blank">Trở thành người đóng góp</a>
-            <a href="https://devopsedu.vn/blog/" target="_blank">Tài liệu tham khảo</a>
-            <a href="https://m.me/139689492555066" target="_blank">Liên hệ</a>
+            <a href="https://devopsedu.vn/" target="_blank" rel="noopener noreferrer">Kênh bản quyền</a>
+            <a href="https://devopsedu.vn/contact/" target="_blank" rel="noopener noreferrer">Trở thành người đóng góp</a>
+            <a href="https://devopsedu.vn/blog/" target="_blank" rel="noopener noreferrer">Tài liệu tham khảo</a>
+            <a href="https://m.me/139689492555066" target="_blank" rel="noopener noreferrer">Liên hệ</a>
           </div>
           <div>
-            <a href="#"><Notifications /></a>
-            <a href="#"><Help /></a>
-            <a href="#"><Language /> Tiếng Việt</a>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Notifications /></button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Help /></button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language /> Tiếng Việt</button>
             {currentUser ? (
               <>
                 <Link to="/profile" className="auth-links">{currentUser.username}</Link>
-                <a href="#" className="auth-links" onClick={this.logOut}>Đăng Xuất</a>
+                <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} className="auth-links" onClick={this.logOut}>Đăng Xuất</button>
               </>
             ) : (
               <>

@@ -6,7 +6,7 @@ import { Carousel } from "react-bootstrap";
 import productService from "../services/ProductService";
 import cartService from "../services/CartService";
 import { toast } from 'react-toastify';
-import { Card, ListGroup } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import 'react-toastify/dist/ReactToastify.css';
 import { Row, Col } from "react-bootstrap";
 import { Facebook } from "@mui/icons-material";
@@ -29,16 +29,7 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [cartId, setCartId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    // Kiểm tra nếu người dùng là admin
-    const user = localStorage.getItem("user");
-    if (user) {
-        const parsedUser = JSON.parse(user);
-        setIsAdmin(parsedUser.username === "admin");
-    }
-}, []);
 
   useEffect(() => {
     retrieveProducts();
