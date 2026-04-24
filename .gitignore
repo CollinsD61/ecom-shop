@@ -1,0 +1,17 @@
+# Terraform
+.terraform/
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Node
+node_modules/
+build/
+
+# Java
+target/
+
+# Env
+.env*
+!terraform/.env.local.example
