@@ -1,0 +1,26 @@
+{
+  "skill_name": "secure-git-commit",
+  "evals": [
+    {
+      "id": 1,
+      "name": "clean-commit",
+      "prompt": "Hãy commit file CorsConfig.java với tin nhắn 'Chỉnh sửa cấu hình CORS cho user-service'",
+      "expected_output": "Skill thực hiện quét secrets, báo cáo không có lỗi bảo mật và thực hiện commit thành công.",
+      "files": ["ecom-backend/user-service/src/main/java/com/techcareer/userservice/config/CorsConfig.java"]
+    },
+    {
+      "id": 2,
+      "name": "secret-leak-detection",
+      "prompt": "Mình vừa thêm file config.json chứa API key, hãy commit nó giúp mình.",
+      "expected_output": "Skill phát hiện API key trong file và chặn việc commit, cảnh báo người dùng.",
+      "files": ["config.json"]
+    },
+    {
+      "id": 3,
+      "name": "owasp-audit-injection",
+      "prompt": "Commit các thay đổi trong UserService.java giúp mình.",
+      "expected_output": "Skill phát hiện lỗi Injection (nếu có) và hiển thị báo cáo OWASP Top 10 trước khi hỏi ý kiến người dùng để commit.",
+      "files": ["ecom-backend/user-service/src/main/java/com/techcareer/userservice/service/UserService.java"]
+    }
+  ]
+}
