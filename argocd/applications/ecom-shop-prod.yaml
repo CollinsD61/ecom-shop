@@ -1,0 +1,66 @@
+# =============================================================================
+# ArgoCD Application — ecom-shop PROD
+# =============================================================================
+# Apply: kubectl apply -f argocd/applications/ecom-shop-prod.yaml
+#
+# ArgoCD se tu dong:
+#   1. Watch repo github.com/CollinsD61/ecom-shop (branch main)
+#   2. Render Helm chart tu ecom-shop-chart/ voi values/prod.yaml
+#   3. Sync vao EKS cluster (namespace ecom-prod)
+# =============================================================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ecom-shop-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: ecom-shop
+    environment: prod
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/CollinsD61/ecom-shop.git
+    targetRevision: main
+    path: ecom-shop-chart
+
+    helm:
+      valueFiles:
+        - values/prod.yaml
+      parameters:
+        - name: ingress.enabled
+          value: "true"
+        - name: gatewayApi.enabled
+          value: "false"
+        - name: gatewayApi.httpRoutes.enabled
+          value: "false"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ecom-prod
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas

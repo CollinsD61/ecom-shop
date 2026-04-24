@@ -1,0 +1,69 @@
+# =============================================================================
+# ArgoCD Application — ecom-shop DEV
+# =============================================================================
+# Apply: kubectl apply -f argocd/applications/ecom-shop-dev.yaml
+#
+# ArgoCD se tu dong:
+#   1. Watch repo github.com/CollinsD61/ecom-shop (branch develop)
+#   2. Render Helm chart tu ecom-shop-chart/ voi values/dev.yaml
+#   3. Sync vao EKS cluster (namespace ecom-dev)
+# =============================================================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ecom-shop-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: ecom-shop
+    environment: dev
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/CollinsD61/ecom-shop.git
+    targetRevision: develop
+    path: ecom-shop-chart
+
+    helm:
+      valueFiles:
+        - values/dev.yaml
+      parameters:
+        - name: ingress.enabled
+          value: "false"
+        - name: gatewayApi.enabled
+          value: "true"
+        - name: gatewayApi.gatewayClass.create
+          value: "true"
+        - name: gatewayApi.httpRoutes.enabled
+          value: "true"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ecom-dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
+  # Theo doi suc khoe cua tat ca resources
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas

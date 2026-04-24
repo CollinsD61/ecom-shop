@@ -1,0 +1,194 @@
+# =============================================================================
+# 5. Infra CI/CD Shared — Terraform shared resources
+# =============================================================================
+# Pham vi: ECR va tai nguyen dung chung giua dev/prod
+# Trigger: thu cong hoac thay doi thu muc terraform/environments/shared
+# Muc tieu: tach vong doi shared infra khoi app
+# =============================================================================
+
+name: "Infra — Shared"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "terraform/environments/shared/**"
+      - "terraform/modules/ecr/**"
+
+  # Cho phep chay thu cong
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform action"
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: ap-southeast-1
+  TF_WORKING_DIR: terraform/environments/shared
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Terraform Plan
+  # ---------------------------------------------------------------------------
+  plan:
+    name: Terraform Plan (Shared)
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.plan.outputs.has_changes }}
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -out=tfplan 2>&1 | tee plan_output.txt
+          EXIT_CODE=$?
+          set -e
+
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected"
+          elif [ $EXIT_CODE -eq 2 ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected"
+          else
+            echo "Plan failed"
+            exit 1
+          fi
+
+      - name: Upload plan artifact
+        if: steps.plan.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-tfplan
+          path: ${{ env.TF_WORKING_DIR }}/tfplan
+          retention-days: 5
+
+      - name: Plan Summary
+        run: |
+          echo "### 📋 Terraform Plan — Shared" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 plan_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Terraform Apply
+  # ---------------------------------------------------------------------------
+  apply:
+    name: Terraform Apply (Shared)
+    needs: plan
+    # Apply chi khi: manual dispatch voi action=apply, HOAC push vao main co changes
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.action == 'apply') ||
+      (github.event_name == 'push' && needs.plan.outputs.has_changes == 'true')
+    runs-on: ubuntu-latest
+    environment: shared-infra
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: shared-tfplan
+          path: ${{ env.TF_WORKING_DIR }}
+        continue-on-error: true
+
+      - name: Terraform Apply
+        run: |
+          if [ -f tfplan ]; then
+            terraform apply -auto-approve tfplan
+          else
+            terraform apply -auto-approve
+          fi
+
+      - name: Apply Summary
+        run: |
+          echo "### ✅ Terraform Apply — Shared" >> $GITHUB_STEP_SUMMARY
+          echo "Shared infrastructure updated successfully." >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Terraform Destroy (chi manual)
+  # ---------------------------------------------------------------------------
+  destroy:
+    name: Terraform Destroy (Shared)
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    environment: shared-infra-destroy
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+
+      - name: Destroy Summary
+        run: |
+          echo "### ⚠️ Terraform Destroy — Shared" >> $GITHUB_STEP_SUMMARY
+          echo "Shared infrastructure has been destroyed." >> $GITHUB_STEP_SUMMARY

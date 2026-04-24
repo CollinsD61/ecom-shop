@@ -1,0 +1,348 @@
+# =============================================================================
+# 6. Infra CI/CD Environment — Terraform dev/prod
+# =============================================================================
+# Pham vi: VPC/EKS/RDS/Cognito/IRSA theo moi truong
+# Trigger: dev co the auto, prod bat buoc manual approval
+# Muc tieu: kiem soat chat thay doi ha tang, dac biet prod
+# =============================================================================
+
+name: "Infra — Environment"
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "terraform/environments/dev/**"
+      - "terraform/environments/prod/**"
+      - "terraform/modules/**"
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      action:
+        description: "Terraform action"
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: ap-southeast-1
+  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Detect which environments changed (cho push trigger)
+  # ---------------------------------------------------------------------------
+  detect:
+    name: Detect Environments
+    runs-on: ubuntu-latest
+    outputs:
+      environments: ${{ steps.detect.outputs.environments }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            modules:
+              - 'terraform/modules/**'
+            dev:
+              - 'terraform/environments/dev/**'
+            prod:
+              - 'terraform/environments/prod/**'
+
+      - name: Detect changed environments
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENVS='["${{ inputs.environment }}"]'
+          else
+            ENVS='[]'
+            BRANCH="${GITHUB_REF_NAME}"
+            MODULES_CHANGED="${{ steps.filter.outputs.modules }}"
+            DEV_CHANGED="${{ steps.filter.outputs.dev }}"
+            PROD_CHANGED="${{ steps.filter.outputs.prod }}"
+
+            # Check thay doi modules (anh huong tat ca env)
+            # Check dev
+            if [ "$MODULES_CHANGED" = "true" ] || [ "$DEV_CHANGED" = "true" ]; then
+              if [ "$BRANCH" = "develop" ] || [ "$BRANCH" = "main" ]; then
+                ENVS=$(echo "$ENVS" | jq -c '. + ["dev"]')
+              fi
+            fi
+
+            # Check prod — chi tren main
+            if [ "$BRANCH" = "main" ]; then
+              if [ "$MODULES_CHANGED" = "true" ] || [ "$PROD_CHANGED" = "true" ]; then
+                ENVS=$(echo "$ENVS" | jq -c '. + ["prod"]')
+              fi
+            fi
+
+            ENVS=$(echo "$ENVS" | jq -c 'unique')
+          fi
+
+          echo "environments=${ENVS}" >> "$GITHUB_OUTPUT"
+          echo "Will process: ${ENVS}"
+
+  # ---------------------------------------------------------------------------
+  # Terraform Plan
+  # ---------------------------------------------------------------------------
+  plan:
+    name: "Plan (${{ matrix.env }})"
+    needs: detect
+    if: needs.detect.outputs.environments != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: ${{ fromJson(needs.detect.outputs.environments) }}
+    defaults:
+      run:
+        working-directory: terraform/environments/${{ matrix.env }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Ensure Cloudflare token exists
+        run: |
+          if [ -z "${TF_VAR_cloudflare_api_token}" ]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN"
+            exit 1
+          fi
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive ../../
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -out=tfplan 2>&1 | tee plan_output.txt
+          EXIT_CODE=$?
+          set -e
+
+          HAS_CHANGES="false"
+          if [ $EXIT_CODE -eq 2 ]; then
+            HAS_CHANGES="true"
+          elif [ $EXIT_CODE -ne 0 ]; then
+            exit 1
+          fi
+
+          echo "has_changes_${{ matrix.env }}=${HAS_CHANGES}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ matrix.env }}
+          path: terraform/environments/${{ matrix.env }}/tfplan
+          retention-days: 5
+
+      - name: Plan Summary
+        run: |
+          echo "### 📋 Terraform Plan — ${{ matrix.env }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -30 plan_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Apply DEV — auto apply khi push vao develop/main hoac manual
+  # ---------------------------------------------------------------------------
+  apply-dev:
+    name: "Apply (dev)"
+    needs: [detect, plan]
+    if: >
+      contains(fromJson(needs.detect.outputs.environments), 'dev') &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.action == 'apply' && inputs.environment == 'dev') ||
+        (github.event_name == 'push')
+      )
+    runs-on: ubuntu-latest
+    environment:
+      name: dev-infra
+    defaults:
+      run:
+        working-directory: terraform/environments/dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Ensure Cloudflare token exists
+        run: |
+          if [ -z "${TF_VAR_cloudflare_api_token}" ]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN"
+            exit 1
+          fi
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-dev
+          path: terraform/environments/dev
+        continue-on-error: true
+
+      - name: Terraform Apply
+        run: |
+          if [ -f tfplan ]; then
+            terraform apply -auto-approve tfplan
+          else
+            terraform apply -auto-approve
+          fi
+
+      - name: Summary
+        run: |
+          echo "### ✅ Terraform Apply — dev" >> $GITHUB_STEP_SUMMARY
+          echo "Dev infrastructure updated successfully." >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Apply PROD — bat buoc manual approval qua GitHub Environments
+  # ---------------------------------------------------------------------------
+  apply-prod:
+    name: "Apply (prod) 🔒"
+    needs: [detect, plan]
+    if: >
+      contains(fromJson(needs.detect.outputs.environments), 'prod') &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.action == 'apply' && inputs.environment == 'prod') ||
+        (github.event_name == 'push' && github.ref == 'refs/heads/main')
+      )
+    runs-on: ubuntu-latest
+    # BAT BUOC: can approval qua GitHub Environment "production-infra"
+    environment:
+      name: production-infra
+    defaults:
+      run:
+        working-directory: terraform/environments/prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Ensure Cloudflare token exists
+        run: |
+          if [ -z "${TF_VAR_cloudflare_api_token}" ]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN"
+            exit 1
+          fi
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-prod
+          path: terraform/environments/prod
+        continue-on-error: true
+
+      - name: Terraform Apply
+        run: |
+          if [ -f tfplan ]; then
+            terraform apply -auto-approve tfplan
+          else
+            terraform apply -auto-approve
+          fi
+
+      - name: Summary
+        run: |
+          echo "### ✅ Terraform Apply — prod" >> $GITHUB_STEP_SUMMARY
+          echo "Production infrastructure updated successfully." >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Destroy (chi manual, can approval)
+  # ---------------------------------------------------------------------------
+  destroy:
+    name: "Destroy (${{ inputs.environment }}) ⚠️"
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}-infra-destroy
+    defaults:
+      run:
+        working-directory: terraform/environments/${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_INFRA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+
+      - name: Ensure Cloudflare token exists
+        run: |
+          if [ -z "${TF_VAR_cloudflare_api_token}" ]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN"
+            exit 1
+          fi
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+
+      - name: Summary
+        run: |
+          echo "### ⚠️ Terraform Destroy — ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "Infrastructure has been destroyed." >> $GITHUB_STEP_SUMMARY

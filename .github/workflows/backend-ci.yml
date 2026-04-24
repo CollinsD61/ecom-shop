@@ -1,0 +1,156 @@
+# =============================================================================
+# 2. Backend CI — Monorepo, matrix theo service
+# =============================================================================
+# Services: user-service, product-service, shopping-cart-service
+# Trigger: thay doi trong tung service (push vao main/develop)
+# Viec lam: test, build image, push ECR theo tag commit
+# Muc tieu: moi service release doc lap, quan ly gon trong 1 workflow matrix
+# =============================================================================
+
+name: "Backend CI"
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "ecom-backend/user-service/**"
+      - "ecom-backend/product-service/**"
+      - "ecom-backend/shopping-cart-service/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REGISTRY: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Detect which services changed
+  # ---------------------------------------------------------------------------
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.set-matrix.outputs.services }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter changed service paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            user_service:
+              - 'ecom-backend/user-service/**'
+            product_service:
+              - 'ecom-backend/product-service/**'
+            shopping_cart_service:
+              - 'ecom-backend/shopping-cart-service/**'
+
+      - name: Detect changed services
+        id: set-matrix
+        run: |
+          SERVICES='[]'
+
+          if [ "${{ steps.filter.outputs.user_service }}" = "true" ]; then
+            SERVICES=$(echo "$SERVICES" | jq -c '. + ["user-service"]')
+          fi
+          if [ "${{ steps.filter.outputs.product_service }}" = "true" ]; then
+            SERVICES=$(echo "$SERVICES" | jq -c '. + ["product-service"]')
+          fi
+          if [ "${{ steps.filter.outputs.shopping_cart_service }}" = "true" ]; then
+            SERVICES=$(echo "$SERVICES" | jq -c '. + ["shopping-cart-service"]')
+          fi
+
+          echo "services=${SERVICES}" >> "$GITHUB_OUTPUT"
+          echo "Will build: ${SERVICES}"
+
+  # ---------------------------------------------------------------------------
+  # Test → Build → Push ECR (matrix)
+  # ---------------------------------------------------------------------------
+  build-and-push:
+    name: "Build ${{ matrix.service }}"
+    needs: changes
+    if: needs.changes.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJson(needs.changes.outputs.services) }}
+    defaults:
+      run:
+        working-directory: ecom-backend/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- JDK + Maven cache ---
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: maven
+
+      # --- Unit test ---
+      - name: Run tests
+        run: ./mvnw test -B
+
+      # --- AWS credentials ---
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # --- Login ECR ---
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # --- Metadata for tags ---
+      - name: Prepare image tags
+        id: meta
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BRANCH="${GITHUB_REF_NAME}"
+
+          # Tag strategy: branch-sha, branch-latest
+          if [ "$BRANCH" = "main" ]; then
+            TAG_PREFIX=""
+          else
+            TAG_PREFIX="${BRANCH}-"
+          fi
+
+          IMAGE="${ECR_REGISTRY}/${{ matrix.service }}"
+          TAGS="${IMAGE}:${TAG_PREFIX}${SHORT_SHA},${IMAGE}:${TAG_PREFIX}latest"
+
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "tag_prefix=${TAG_PREFIX}" >> "$GITHUB_OUTPUT"
+
+      # --- Build + Push ---
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: ecom-backend/${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+      # --- Summary ---
+      - name: Job summary
+        run: |
+          echo "### ✅ ${{ matrix.service }}" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | \`${{ steps.meta.outputs.image }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tags | \`${{ steps.meta.outputs.tag_prefix }}${{ steps.meta.outputs.short_sha }}\`, \`${{ steps.meta.outputs.tag_prefix }}latest\` |" >> $GITHUB_STEP_SUMMARY

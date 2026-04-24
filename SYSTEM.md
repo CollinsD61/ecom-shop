@@ -1,238 +1,230 @@
 # SYSTEM
 
-## 1. TONG QUAN HE THONG (TARGET)
+## 1. TONG QUAN HE THONG
 
-Tai lieu nay mo ta kien truc muc tieu khi dua he thong len AWS EKS voi:
+Tai lieu nay mo ta kien truc cua he thong ecom-shop tren AWS EKS (cloud-native):
 
-- Khong dung `api-gateway` trong codebase.
-- Khong dung `discovery-server` (Eureka).
-- Khong dung `keycloak` + `keycloak-mysql`.
-- Thay `config-server` bang `AWS Secrets Manager` de luu tru secrets.
-- Su dung `ALB Ingress Controller` + `Cognito` de xu ly vao/ra va auth.
+- **Khong dung** `api-gateway` trong codebase.
+- **Khong dung** `discovery-server` (Eureka) — thay bang **Kubernetes DNS (CoreDNS)**.
+- **Khong dung** `config-server` (Spring Cloud Config) — thay bang **Kubernetes ConfigMap** (non-sensitive) + **AWS Secrets Manager** (sensitive).
+- **Khong dung** `keycloak` + `keycloak-mysql` — thay bang **AWS Cognito**.
+- Su dung `Kubernetes Gateway API` (`GatewayClass` / `Gateway` / `HTTPRoute`) de route traffic.
+- Su dung `Cognito` (OIDC) cho auth o lop edge (ALB/Gateway).
 - Trien khai bang `ArgoCD` theo GitOps, image luu tren `ECR`.
 - Su dung `IRSA` + `External Secrets Operator` de cap secrets vao Kubernetes.
 
-Phan ung dung chinh con lai:
+Phan ung dung chinh:
 
-- `ecom-frontend` (React)
-- `user-service`
-- `product-service`
-- `shopping-cart-service`
+- `ecom-frontend` (React SPA — S3 Static Hosting)
+- `user-service` (Spring Boot 3)
+- `product-service` (Spring Boot 3)
+- `shopping-cart-service` (Spring Boot 3)
 
 ## 2. KIEN TRUC MICROSERVICES TREN AWS
 
 ### 2.1 So do tong the
 
 ```text
-┌───────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                   INTERNET / END USER                                        │
-└──────────────────────────────────────────────┬────────────────────────────────────────────────┘
-                                               │ HTTPS
-                                               ▼
-┌──────────────────────────────────────────────┐
-│            CLOUDFLARE (DNS + Proxy)          │
-│  shop.dohoangdevops.io.vn / argocd...         │
-└──────────────────────────────────────────────┬┘
-                                               │
-                                               ▼
-┌───────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                AWS (ap-southeast-1 / Singapore)                              │
-│                                                                                               │
-│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ VPC: 10.0.0.0/16                                                                        │  │
-│  │                                                                                         │  │
-│  │  ┌──────────────────────────────────── AZ-a ─────────────────────────────────────┐      │  │
-│  │  │ Public subnet-1: 10.0.0.0/22                                                 │      │  │
-│  │  │  - ALB node (internet-facing)                                                │      │  │
-│  │  │  - NAT Gateway #1 (EIP)                                                      │      │  │
-│  │  └───────────────────────────────────────────────────────────────────────────────┘      │  │
-│  │                                                                                         │  │
-│  │  ┌──────────────────────────────────── AZ-b ─────────────────────────────────────┐      │  │
-│  │  │ Public subnet-2: 10.0.4.0/22                                                 │      │  │
-│  │  │  - ALB node (internet-facing)                                                │      │  │
-│  │  │  - NAT Gateway #2 (EIP)                                                      │      │  │
-│  │  └───────────────────────────────────────────────────────────────────────────────┘      │  │
-│  │                                                                                         │  │
-│  │  ┌──────────────────────────────────── AZ-a ─────────────────────────────────────┐      │  │
-│  │  │ Private subnet-1: 10.0.8.0/22                                                │      │  │
-│  │  │  - EKS worker node (nodegroup)                                               │      │  │
-│  │  │  - Pods: user-service / product-service / shopping-cart-service              │      │  │
-│  │  │  - Pods: aws-load-balancer-controller / external-dns / argocd-server         │      │  │
-│  │  └───────────────────────────────────────────────────────────────────────────────┘      │  │
-│  │                                                                                         │  │
-│  │  ┌──────────────────────────────────── AZ-b ─────────────────────────────────────┐      │  │
-│  │  │ Private subnet-2: 10.0.12.0/22                                               │      │  │
-│  │  │  - EKS worker node (nodegroup)                                               │      │  │
-│  │  │  - Pods scale/failover across AZ                                             │      │  │
-│  │  └───────────────────────────────────────────────────────────────────────────────┘      │  │
-│  │                                                                                         │  │
-│  │  ┌───────────────────────────────────────────────────────────────────────────────────┐   │  │
-│  │  │ Amazon RDS PostgreSQL (Multi-AZ, private DB subnet group)                       │   │  │
-│  │  │  - Khong public IP                                                               │   │  │
-│  │  │  - Chi cho phep SG tu EKS workload truy cap (5432)                              │   │  │
-│  │  └───────────────────────────────────────────────────────────────────────────────────┘   │  │
-│  └─────────────────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                               │
-│  Cognito User Pool + App Client  <---- ALB authentication (OIDC/Cognito)                     │
-│  ECR: <account>.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop                                │
-│  Secret flow: EKS Pods (IRSA) -> AWS Secrets Manager                                           │
-└───────────────────────────────────────────────────────────────────────────────────────────────┘
-                                               ▲
-                                               │ GitOps Pull
-┌───────────────────────────────────────────────────────────────────────────────────────────────┐
-│ GitHub Repo (manifests/helm) -> ArgoCD sync -> EKS                                            │
-└───────────────────────────────────────────────────────────────────────────────────────────────┘
+INTERNET --> Cloudflare (CDN) --> S3 (React Static Hosting)
+                   |
+                   | API requests
+                   v
+              AWS ALB (public subnet, internet-facing)
+                   |
+     ┌─────────────┴──────────────┐
+     │      Gateway API           │
+     │ GatewayClass / Gateway / HTTPRoute │
+     │                            │
+     │ /api/user/*      → user    │
+     │ /api/product/*   → product │
+     │ /api/shopping-*  → cart    │
+     └─────────────┬──────────────┘
+                   |
+     ┌─────────────┴─────────────────────────────────┐
+     │         EKS Cluster (private subnet)          │
+     │ user-service     ──────────────────────────► RDS
+     │ product-service  ──────────────────────────► RDS
+     │ shopping-cart-service  ────────────────────► RDS
+     │      │ K8s DNS → product-service:5861         │
+     └───────────────────────────────────────────────┘
 
-┌───────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Secret Management Plane (AWS Managed)                                                         │
-│  - External Secrets Operator (trong EKS)                                                      │
-│  - IRSA role cho tung service account                                                         │
-│  - AWS Secrets Manager (luu DB creds, app secrets, API keys)                                 │
-└───────────────────────────────────────────────────────────────────────────────────────────────┘
+ECR repos: user-service | product-service | shopping-cart-service
+Secrets Manager: /ecom/{env}/{service}/db, /ecom/{env}/user-service/cognito
+Cognito User Pool: edge auth via Gateway
+ArgoCD: GitOps pull from GitHub → sync to EKS
 ```
-
-CIDR theo thiet ke:
-
-- VPC: 10.0.0.0/16
-- public subnet-1: 10.0.0.0/22
-- public subnet-2: 10.0.4.0/22
-- private subnet-1: 10.0.8.0/22
-- private subnet-2: 10.0.12.0/22
 
 ### 2.2 So do luong request chi tiet
 
-```text
-[User Browser]
+```mermaid
+flowchart LR
+    Browser["Browser (React)"] -->|HTML/JS| CF[Cloudflare]
+    CF --> S3[Amazon S3 Static Host]
+    Browser -->|API Requests| CF
+    CF --> G[ALB / Gateway]
+    G --> H[HTTPRoute Rules]
+    H -->|"/api/user/*"| US[user-service Pod]
+    H -->|"/api/product/*"| PS[product-service Pod]
+    H -->|"/api/shopping-cart/*"| CS[shopping-cart-service Pod]
+    US --> DB[(RDS PostgreSQL)]
+    PS --> DB
+    CS --> DB
+    CS -->|K8s DNS| PS
+    US -->|K8s DNS| CS
+```
+
+Request flow chi tiet:
+
+[User Browser (chay React app)]
     |
     | 1) HTTPS request (GET/POST /api/*)
     v
-[Cloudflare]
+[Cloudflare DNS / CDN]
     |
-    | 2) Forward request to ALB origin
+    | 2) DNS resolve → Gateway endpoint
     v
-[AWS ALB + Ingress Rules]
+[Gateway (HTTPS :443)]
     |
     | 3) Check authentication session/token
-    |    - Neu chua auth -> redirect Cognito
+    |    - Chua auth → redirect Cognito Hosted UI
     v
 [Amazon Cognito Hosted UI]
     |
-    | 4) User login thanh cong
-    |    return auth code/token/session
+    | 4) User login thanh cong → return token/session
     v
-[AWS ALB + Ingress Rules]
+[Gateway + HTTPRoute Rules]
     |
-    | 5) Route theo host/path
-    |    /api/user/* -> user-service
-    |    /api/product/* -> product-service
-    |    /api/shopping-cart/* -> shopping-cart-service
+    | 5) Route theo path:
+    |    /api/user/*           → user-service (ClusterIP :5865)
+    |    /api/product/*        → product-service (ClusterIP :5861)
+    |    /api/shopping-cart/*  → shopping-cart-service (ClusterIP :5863)
     v
 [Service Pod trong EKS private subnet]
     |
     | 6) Xu ly business logic
-    |    (co the goi service khac trong cluster)
+    |    Goi service khac qua Kubernetes DNS (http://service-name:port)
     v
-[Amazon RDS PostgreSQL - private DB subnet group]
+[Amazon RDS PostgreSQL - private subnet]
     |
     | 7) Query/Update data
     v
-[Service Pod] -> [ALB] -> [Cloudflare] -> [User Browser]
+[Response] → Gateway → Cloudflare → User Browser
 ```
 
-### 2.3 So do luong lay secret tu AWS Secrets Manager (thay Config Server)
+### 2.3 Cau hinh va Secrets — Thay the Config Server
+
+#### Non-sensitive config: Kubernetes ConfigMap
+
+Helm chart tao ConfigMap tu `configMap` section trong values:
+
+```yaml
+# values/dev.yaml (vi du)
+services:
+  shopping-cart-service:
+    configMap:
+      PRODUCT_SERVICE_URL: http://product-service:5861
+      JPA_SHOW_SQL: "true"
+  user-service:
+    configMap:
+      SHOPPING_CART_SERVICE_URL: http://shopping-cart-service:5863
+      JPA_SHOW_SQL: "true"
+```
+
+#### Sensitive config: AWS Secrets Manager + External Secrets Operator
 
 ```text
 [Service Pod trong EKS]
     |
-    | 1) App khoi dong / can doc secret
-    |    (db url, db user, db password, api keys...)
+    | 1) ExternalSecret resource tham chieu secret trong Secrets Manager
     v
-[External Secrets Operator / CSI Driver]
+[External Secrets Operator]
     |
-    | 2) Assume IAM role qua IRSA
-    |    (service account -> IAM role)
+    | 2) Assume IAM role qua IRSA (service account → IAM role)
     v
 [AWS Secrets Manager]
     |
     | 3) IAM policy check + tra secret value
     v
-[Kubernetes Secret]
+[Kubernetes Secret] (auto-created by ESO)
     |
-    | 4) Inject vao pod (ENV hoac volume)
+    | 4) Inject vao pod qua envFrom secretRef
     v
-[App Runtime]
+[App Runtime] — doc SPRING_DATASOURCE_URL, SPRING_DATASOURCE_PASSWORD, v.v.
 ```
 
-### 2.4 Luong hoat dong
+### 2.4 Service Discovery — Thay the Eureka
 
-1. End user thao tac tren frontend va gui request HTTPS den domain shop.
-2. Cloudflare nhan request va forward vao ALB cua EKS.
-3. ALB ap dung rule Ingress theo host/path de route vao service dung trong cluster.
-4. Neu chua dang nhap, ALB redirect user sang Cognito.
-5. User dang nhap xong, Cognito redirect ve lai ALB kem token/session hop le.
-6. ALB tiep tuc route request vao service dich (`user-service`, `product-service`, `shopping-cart-service`).
-7. Service xu ly nghiep vu, neu can thi goi service khac trong cluster qua Kubernetes DNS.
-8. Ket qua tra nguoc: service -> ALB -> Cloudflare -> end user.
+| Truoc (On-Premise) | Sau (Cloud-Native) |
+|---|---|
+| Eureka Server (port 8761) | **Kubernetes CoreDNS** (EKS addon) |
+| `@LoadBalanced` RestTemplate | Plain `RestTemplate` + env var URL |
+| `http://PRODUCT-SERVICE/api/...` | `http://product-service:5861/api/...` |
+| `http://SHOPPING-CART-SERVICE/api/...` | `http://shopping-cart-service:5863/api/...` |
+| `spring-cloud-starter-netflix-eureka-client` | **Removed** |
+| `spring-cloud-starter-config` | **Removed** |
+| `spring-cloud-starter-bootstrap` | **Removed** |
+
+Kubernetes Service (ClusterIP) tu dong dang ky DNS record:
+- `product-service.default.svc.cluster.local` (hoac `product-service:5861`)
+- `shopping-cart-service.default.svc.cluster.local`
+- `user-service.default.svc.cluster.local`
 
 ### 2.5 Lien ket giua cac service
 
-- `shopping-cart-service` goi `product-service` de lay gia moi nhat khi tinh tong tien gio hang.
-- `user-service` co the goi `shopping-cart-service` de tim/xoa gio hang theo user.
-- `user-service`, `product-service`, `shopping-cart-service` doc/ghi du lieu tren PostgreSQL (RDS trong production).
-- Cac service khong con phu thuoc `api-gateway` va `discovery-server`.
-- Secrets cua services khong lay tu `config-server` nua ma lay tu `AWS Secrets Manager` thong qua IRSA.
+- `shopping-cart-service` goi `product-service` qua K8s DNS de lay gia moi nhat khi tinh tong tien gio hang.
+- `user-service` goi `shopping-cart-service` qua K8s DNS de tim/xoa gio hang theo user.
+- Tat ca services doc/ghi du lieu tren Amazon RDS PostgreSQL.
+- Cac service **khong con phu thuoc** `config-server`, `api-gateway`, `discovery-server`.
+- Secrets lay tu **AWS Secrets Manager** thong qua IRSA + External Secrets Operator.
+- Non-sensitive config lay tu **Kubernetes ConfigMap**.
 
 ### 2.6 Vi tri dat RDS trong mang
 
-- Nen dat RDS trong private subnets (khong public IP), toi thieu 2 AZ de dam bao HA.
-- RDS nen nam trong DB subnet group rieng (gom cac private subnets), khong dat cung public subnet voi ALB.
-- ALB nam public subnets, con EKS worker node va RDS nam private subnets.
-- Service trong EKS ket noi RDS qua private route va Security Group cho phep dung port 5432.
+- RDS nam trong private subnets (khong public IP), toi thieu 2 AZ.
+- RDS nam trong DB subnet group rieng (gom cac private subnets).
+- ALB/Gateway nam o public subnets; EKS worker nodes va RDS nam o private subnets.
+- Service trong EKS ket noi RDS qua private route + Security Group (port 5432).
 - Khong mo inbound RDS ra Internet.
 
-### 2.7 Cac thanh phan bi loai bo trong kien truc moi
+### 2.7 Cac thanh phan DA LOAI BO
 
-- `api-gateway`
-- `discovery-server`
-- `keycloak-realms`
-- `mysql_keycloak_data`
-- `config-server` (thay bang AWS Secrets Manager)
+| Component | Ly do loai bo | Thay the bang |
+|---|---|---|
+| `config-server` | On-premise, single point of failure | K8s ConfigMap + Secrets Manager |
+| `discovery-server` (Eureka) | Khong can thiet tren K8s | Kubernetes CoreDNS |
+| `api-gateway` | Thay bang Gateway API | AWS ALB + GatewayClass/Gateway/HTTPRoute |
+| `keycloak` + `keycloak-mysql` | Self-hosted auth | AWS Cognito |
+| `@LoadBalanced` | Eureka dependency | Plain RestTemplate + env var |
+| `@EnableFeignClients` | Khong su dung | Da xoa |
+| `spring-cloud-*` dependencies | Khong can nua | spring-boot-starter-actuator |
 
-Ghi chu:
+### 2.8 Mapping secret (AWS Secrets Manager)
 
-- Moi service nen co IAM role rieng (least privilege), chi duoc doc dung secret cua service do.
-- Frontend da duoc tach API URL theo tung service (`USER`, `PRODUCT`, `CART`) de khong con phu thuoc URL gateway duy nhat.
+Quy uoc ten secret (dung environment `{env}`):
 
-### 2.8 Mapping secret de xuat (AWS Secrets Manager)
+- `/ecom/{env}/shared/rds` → `host`, `port`, `database`
+- `/ecom/{env}/user-service/db` → `username`, `password`, `jdbc_url`
+- `/ecom/{env}/product-service/db` → `username`, `password`, `jdbc_url`
+- `/ecom/{env}/shopping-cart-service/db` → `username`, `password`, `jdbc_url`
+- `/ecom/{env}/user-service/cognito` → `hosted_ui_login_url`, `hosted_ui_signup_url`
 
-Quy uoc dat ten secret (dung environment `prod`):
+IRSA mapping:
 
-- `/ecom/prod/shared/rds`
-    - `host`
-    - `port`
-    - `database`
+- `sa-user-service` → read `/ecom/{env}/user-service/*` va `/ecom/{env}/shared/*`
+- `sa-product-service` → read `/ecom/{env}/product-service/*` va `/ecom/{env}/shared/*`
+- `sa-shopping-cart-service` → read `/ecom/{env}/shopping-cart-service/*` va `/ecom/{env}/shared/*`
 
-- `/ecom/prod/user-service/db`
-    - `username`
-    - `password`
-    - `jdbc_url`
+### 2.9 Terraform Modules
 
-- `/ecom/prod/product-service/db`
-    - `username`
-    - `password`
-    - `jdbc_url`
-
-- `/ecom/prod/shopping-cart-service/db`
-    - `username`
-    - `password`
-    - `jdbc_url`
-
-- `/ecom/prod/user-service/cognito`
-    - `hosted_ui_login_url`
-    - `hosted_ui_signup_url`
-
-IRSA de xuat:
-
-- `sa-user-service` -> read `/ecom/prod/user-service/*` va `/ecom/prod/shared/*`
-- `sa-product-service` -> read `/ecom/prod/product-service/*` va `/ecom/prod/shared/*`
-- `sa-shopping-cart-service` -> read `/ecom/prod/shopping-cart-service/*` va `/ecom/prod/shared/*`
+| Module | Chuc nang |
+|---|---|
+| `vpc` | VPC, public/private subnets, NAT Gateway, VPC endpoints |
+| `eks` | EKS cluster, node group, OIDC provider, CoreDNS/VPC CNI/kube-proxy addons |
+| `rds` | RDS PostgreSQL, DB subnet group, security group |
+| `alb_controller` | AWS Load Balancer Controller (Helm) |
+| `external_dns` | External DNS (Cloudflare integration) |
+| `argocd` | ArgoCD (GitOps CD) |
+| `cognito` | Cognito User Pool + App Client |
+| `secrets` | AWS Secrets Manager entries |
+| `irsa` | IAM Roles for Service Accounts |
+| `ecr` | Elastic Container Registry |

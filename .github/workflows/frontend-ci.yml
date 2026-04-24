@@ -1,0 +1,98 @@
+# =============================================================================
+# 3. Frontend CI/CD (S3 Static Hosting)
+# =============================================================================
+# Trigger: thay doi trong ecom-frontend (push vao main/develop)
+# Viec lam: build React bundle va sync len Amazon S3
+# Muc tieu: Deploy Frontend len S3 + Cloudflare CDN
+# =============================================================================
+
+name: "Frontend CI/CD"
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "ecom-frontend/**"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-southeast-1
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to S3
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ecom-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Determine Environment Variables based on Branch ---
+      - name: Set environment variables
+        id: env_vars
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          
+          if [ "$BRANCH" = "main" ]; then
+            echo "S3_BUCKET=shop.dohoangdevops.io.vn" >> $GITHUB_ENV
+            echo "API_URL=https://api.shop.dohoangdevops.io.vn/api" >> $GITHUB_ENV
+            echo "ENV_NAME=Production" >> $GITHUB_ENV
+          else
+            echo "S3_BUCKET=shop-dev.dohoangdevops.io.vn" >> $GITHUB_ENV
+            echo "API_URL=https://api.shop-dev.dohoangdevops.io.vn/api" >> $GITHUB_ENV
+            echo "ENV_NAME=Development" >> $GITHUB_ENV
+          fi
+
+      # --- Node.js ---
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: npm
+          cache-dependency-path: ecom-frontend/package-lock.json
+
+      # --- Install + Test ---
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --watchAll=false --passWithNoTests
+        env:
+          CI: true
+
+      # --- Build React Bundle ---
+      - name: Build production bundle
+        run: npm run build
+        env:
+          REACT_APP_USER_API_URL: ${{ env.API_URL }}/user/
+          REACT_APP_PRODUCT_API_URL: ${{ env.API_URL }}/product/
+          REACT_APP_CART_API_URL: ${{ env.API_URL }}/shopping-cart/
+
+      # --- AWS credentials ---
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # --- Deploy to S3 ---
+      - name: Sync files to S3
+        run: |
+          echo "Deploying to $S3_BUCKET..."
+          aws s3 sync build/ s3://${S3_BUCKET} --delete
+
+      # --- Summary ---
+      - name: Job summary
+        run: |
+          echo "### ✅ Frontend Deployed to S3" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | \`${{ env.ENV_NAME }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| S3 Bucket | \`${{ env.S3_BUCKET }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| API Endpoint | \`${{ env.API_URL }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${GITHUB_REF_NAME}\` |" >> $GITHUB_STEP_SUMMARY
