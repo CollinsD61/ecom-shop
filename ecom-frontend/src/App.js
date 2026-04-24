@@ -68,66 +68,156 @@ class App extends Component {
   render() {
     const { currentUser } = this.state;
 
-    // Style của shop now
+    // Refined Minimalist Aesthetic
     const appStyle = `
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Syne:wght@600;700;800&display=swap');
+      
       body {
         margin: 0;
-        font-family: Arial, sans-serif;
+        font-family: 'DM Sans', sans-serif;
+        background-color: #f8f9fa;
+        color: #111;
       }
       .header-container {
         top: 0;
         position: sticky;
         z-index: 1000;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
       }
       .header-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #fd3318;
-        color: #fff;
-        font-size: 14px;
-        padding: 5px 20px;
-
+        background-color: #000;
+        color: #f0f0f0;
+        font-size: 12px;
+        padding: 8px 40px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
       }
       .header-top a {
-        color: #fff;
+        color: #b0b0b0;
         text-decoration: none;
-        margin-left: 10px;
+        margin-left: 20px;
+        transition: color 0.3s ease;
       }
       .header-top a:hover {
-        text-decoration: underline;
+        color: #fff;
       }
       .navbar {
-        background-color: #fd3318;
-        padding: 20px 20px;
-        top: 1;
-        position: sticky;
-        z-index: 1000;
+        background-color: #ffffff;
+        padding: 20px 40px;
+        border-bottom: 1px solid #eaeaea;
+      }
+      .navbar-brand img {
+        filter: grayscale(100%) contrast(1.2);
+        transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      }
+      .navbar-brand:hover img {
+        transform: scale(1.05);
       }
       .search-form {
         display: flex;
-        width: 600px;
+        width: 500px;
+        border: 1px solid #ccc;
+        border-radius: 30px;
+        overflow: hidden;
+        transition: border-color 0.3s ease;
+      }
+      .search-form:focus-within {
+        border-color: #000;
       }
       .search-form input {
         flex: 1;
         border: none;
-        padding: 8px 10px;
+        padding: 12px 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px;
+        outline: none;
       }
       .search-button {
-        background-color: #fb6445;
+        background-color: transparent;
         border: none;
-        padding: 0 15px;
+        padding: 0 20px;
+        color: #000;
+        transition: background-color 0.3s ease;
+      }
+      .search-button:hover {
+        background-color: #f0f0f0;
       }
       .search-button svg {
-        color: white;
+        color: #000;
       }
       .nav-icons a {
-        color: white;
-        margin-left: 15px;
+        color: #000;
+        margin-left: 25px;
+        transition: transform 0.3s ease;
+        display: inline-block;
       }
-      .auth-links a {
-        color: white;
-        margin-left: 10px;
+      .nav-icons a:hover {
+        transform: translateY(-2px);
+      }
+      .auth-links {
+        font-family: 'Syne', sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+      }
+      
+      /* Global Card Styling for Login/Register */
+      .cardLogin {
+        background: #fff;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid #f0f0f0;
+        max-width: 450px;
+        margin: 60px auto;
+        font-family: 'DM Sans', sans-serif;
+      }
+      .cardLogin label {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+        display: block;
+        color: #333;
+      }
+      .cardLogin .form-control {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+      .cardLogin .form-control:focus {
+        border-color: #000;
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        outline: none;
+      }
+      .cardLogin .btn-primary {
+        background-color: #000;
+        border: none;
+        border-radius: 30px;
+        padding: 12px 30px;
+        font-family: 'Syne', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .cardLogin .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        background-color: #222;
+      }
+      .profile-img-card {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 30px;
+        display: block;
+        opacity: 0.8;
       }
     `;
 
@@ -163,7 +253,7 @@ class App extends Component {
         </div>
 
         {/* Navbar */}
-        <Navbar expand="lg" className="navbar" variant="dark">
+        <Navbar expand="lg" className="navbar" variant="light">
           <Container fluid>
             {/* Logo */}
             <Navbar.Brand as={Link} to="/">
