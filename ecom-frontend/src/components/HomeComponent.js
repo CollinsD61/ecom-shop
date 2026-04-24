@@ -199,7 +199,7 @@ export default function Home() {
                                                 ? product.description.substring(0, 66) + "..." 
                                                 : product.description}
                                         </Card.Text>
-                                        <Card.Text style={{ color: 'red' }}>
+                                        <Card.Text style={{ color: '#0d3b3e', fontWeight: 600 }}>
                                             {formatCurrency(product.price)} VNĐ
                                         </Card.Text>
                                         {currentProduct?.price}

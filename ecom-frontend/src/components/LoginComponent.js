@@ -90,7 +90,7 @@ class Login extends Component {
                         alt="profile-img"
                         className="profile-img-card"
                     />
-                    <h2 style={{ fontFamily: "'Syne', sans-serif", textAlign: "center", marginBottom: "30px", fontSize: "24px", letterSpacing: "0.1em", textTransform: "uppercase" }}>Sign In</h2>
+                    <h2>Sign In</h2>
 
                     <Form
                         onSubmit={this.handleLogin}
