@@ -96,8 +96,8 @@ jobs:
           cache: maven
 
       # --- Unit test ---
-      - name: Run tests (Compile only to skip DB connection tests)
-        run: ./mvnw clean compile -B
+      - name: Run tests
+        run: ./mvnw test -B
 
       # --- AWS credentials ---
       - name: Configure AWS credentials

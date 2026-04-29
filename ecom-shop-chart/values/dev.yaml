@@ -121,14 +121,6 @@ services:
           remoteRef:
             key: /ecom/dev/user-service/db
             property: password
-        - secretKey: COGNITO_HOSTED_UI_LOGIN_URL
-          remoteRef:
-            key: /ecom/dev/user-service/cognito
-            property: hosted_ui_login_url
-        - secretKey: COGNITO_HOSTED_UI_SIGNUP_URL
-          remoteRef:
-            key: /ecom/dev/user-service/cognito
-            property: hosted_ui_signup_url
 
   product-service:
     enabled: true

@@ -2,9 +2,6 @@ spring:
   application:
     name: user-service
 
-  profiles:
-    active: localhost
-
 server:
   port: 5865
 
@@ -13,18 +10,11 @@ server:
 spring:
   config:
     activate:
-      on-profile: localhost
-  cloud:
-    config:
-      uri: http://config-server:5859
-
----
-
-spring:
+      on-profile: dev
   datasource:
-    url: jdbc:postgresql://192.168.1.110:5432/postgres?useSSL=false
-    username: postgres
-    password: admin
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
   jpa:
     hibernate:
       ddl-auto: update
@@ -32,7 +22,10 @@ spring:
     properties:
       hibernate:
         format-sql: true
+  cloud:
+    config:
+      enabled: false
 
-cognito:
-  hosted_ui_login_url: https://your-cognito-domain.auth.ap-southeast-1.amazoncognito.com/login
-  hosted_ui_signup_url: https://your-cognito-domain.auth.ap-southeast-1.amazoncognito.com/signup
+eureka:
+  client:
+    enabled: false

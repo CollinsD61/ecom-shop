@@ -1,33 +1,31 @@
 spring:
- application:
-  name: shopping-cart-service
-
- profiles:
-  active: localhost
+  application:
+    name: shopping-cart-service
 
 server:
- port: 5863
- 
+  port: 5863
+
 ---
+
 spring:
- config:
-  activate:
-   on-profile: localhost
- cloud:
-  config: 
-   uri: http://config-server:5859
-   
----
-spring:
- datasource: 
-  url: jdbc:postgresql://192.168.1.110:5432/postgres?useSSL=false
-  username: postgres
-  password: admin
- jpa:
-  hibernate:
-   ddl-auto: update
-  show-sql: true
-  properties: 
-   hibernate:
-    format-sql: true
-  
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format-sql: true
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false

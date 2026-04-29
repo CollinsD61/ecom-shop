@@ -1,7 +1,6 @@
 package com.techcareer.userservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,6 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
-    @Value("${cognito.hosted_ui_login_url:}")
-    String cognitoHostedUiLoginUrl;
-
-    @Value("${cognito.hosted_ui_signup_url:}")
-    String cognitoHostedUiSignupUrl;
 
     @Autowired
     UserRepository userRepository;
@@ -39,7 +33,6 @@ public class UserService {
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            // Simple plain-text password check since Spring Security is removed
             if (user.getPassword().equals(loginRequest.getPassword())) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("accessToken", "local-jwt-token-for-" + user.getUsername());
@@ -49,22 +42,25 @@ public class UserService {
                 return ResponseEntity.ok(response);
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Error: Invalid username or password!"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new MessageResponse("Error: Invalid username or password!"));
     }
 
     public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        // Create new user's account
+        // Create new user account with local database storage
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                signUpRequest.getPassword()); // Storing plaintext for simplicity as requested
+                signUpRequest.getPassword());
 
         userRepository.save(user);
 
@@ -106,10 +102,9 @@ public class UserService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
-            // Password is managed by Cognito, user-service only maintains local profile attributes.
+            // Update password if provided
             if (updateUserRequest.getPassword() != null && !updateUserRequest.getPassword().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(new MessageResponse("Password updates must be done in Cognito."));
+                user.setPassword(updateUserRequest.getPassword());
             }
 
             // Update email if provided

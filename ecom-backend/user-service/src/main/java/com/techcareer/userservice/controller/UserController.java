@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/user")
 @Tag(name = "user", description = "User Endpoints")
@@ -31,17 +33,19 @@ public class UserController {
 	UserService userService;
 
 	@PostMapping("/signin")
-	@Operation(summary = "Authenticate user", description = "Authentication is handled by Cognito Hosted UI")
+	@Operation(summary = "Authenticate user", description = "Login with username and password")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "501", description = "Local signin is disabled, use Cognito Hosted UI") })
+			@ApiResponse(responseCode = "200", description = "Login successful"),
+			@ApiResponse(responseCode = "401", description = "Invalid credentials") })
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		return userService.authenticateUser(loginRequest);
 	}
 
 	@PostMapping("/signup")
-	@Operation(summary = "Create authenticated users", description = "Signup is handled by Cognito Hosted UI")
+	@Operation(summary = "Register new user", description = "Create a new user account")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "501", description = "Local signup is disabled, use Cognito Hosted UI") })
+			@ApiResponse(responseCode = "200", description = "User registered successfully"),
+			@ApiResponse(responseCode = "400", description = "Username or email already exists") })
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		return userService.registerUser(signUpRequest);
 	}
