@@ -230,7 +230,7 @@ export default function Home() {
           <Col md={4} className="mb-3">
             <h5>About Us</h5>
             <p>
-              Shop now - Microservice.
+              Ecom-Shop .
             </p>
           </Col>
 
@@ -254,17 +254,17 @@ export default function Home() {
           <Col md={4} className="mb-3">
             <h5>Follow Us</h5>
             <div className="d-flex gap-3">
-              <a href="https://www.facebook.com/groups/devopsedu.vn" target="_blank" rel="noopener noreferrer" className="text-dark">
+              <a href="https://www.facebook.com/do.hoang.uyh" target="_blank" rel="noopener noreferrer" className="text-dark">
                 <Facebook />
               </a>
-              <a href="https://www.youtube.com/@devopseduvn" target="_blank" rel="noopener noreferrer" className="text-dark">
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-dark">
                 <YouTube />
               </a>
             </div>
           </Col>
         </Row>
         <hr className="border-light" />
-        <p className="text-center mb-0">&copy; {new Date().getFullYear()} Shop now - Microservice - devopsedu.vn. All rights reserved.</p>
+        <p className="text-center mb-0">&copy; {new Date().getFullYear()} Ecom-Shop - devops.io.vn. All rights reserved.</p>
       </Container>
     </footer>
     </Container>
