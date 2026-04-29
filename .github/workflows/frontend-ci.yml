@@ -46,7 +46,7 @@ jobs:
             echo "ENV_NAME=Production" >> $GITHUB_ENV
           else
             echo "S3_BUCKET=shop-dev.dohoangdevops.io.vn" >> $GITHUB_ENV
-            echo "API_URL=https://api.shop-dev.dohoangdevops.io.vn/api" >> $GITHUB_ENV
+            echo "API_URL=https://api-dev.dohoangdevops.io.vn/api" >> $GITHUB_ENV
             echo "APP_URL=https://shop-dev.dohoangdevops.io.vn" >> $GITHUB_ENV
             echo "ENV_NAME=Development" >> $GITHUB_ENV
           fi

@@ -21,7 +21,7 @@ ingress:
     alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
   hosts:
-    - host: api.shop-dev.dohoangdevops.io.vn
+    - host: api-dev.dohoangdevops.io.vn
       paths:
         - path: /api/user
           pathType: Prefix
@@ -42,7 +42,7 @@ httpRoute:
     - name: gateway
       sectionName: http
   hostnames:
-    - api.shop-dev.dohoangdevops.io.vn
+    - api-dev.dohoangdevops.io.vn
   rules:
     - matches:
         - path:
