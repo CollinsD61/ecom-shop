@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import { Add, Inventory2Sharp, ShoppingCartRounded } from "@mui/icons-material";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { assetUrl } from "../helpers/assetUrl";
 
 const ProductsList = () => {
     const [products, setProducts] = useState([]);
@@ -252,7 +253,7 @@ const ProductsList = () => {
                                 <Card className="product-card">
                                     <Card.Img 
                                         variant="top" 
-                                        src={`/${productImageMap[product.name] || "placeholder.png"}`}
+                                        src={assetUrl(productImageMap[product.name] || "placeholder.png")}
                                         onClick={() => setActiveProduct(product, index)} 
                                     />
                                     <Card.Body>

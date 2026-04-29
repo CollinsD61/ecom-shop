@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Card } from "react-bootstrap";
 import Button from '@mui/material/Button';
 import { ModeEdit } from "@mui/icons-material";
+import { assetUrl } from "../helpers/assetUrl";
 
 class Profile extends Component {
 
@@ -18,7 +19,7 @@ class Profile extends Component {
             <div className="row justify-content-center">
                 <h3>Profile</h3>
                 <Card style={{ marginTop: 0,borderRadius: '14px', overflow: 'hidden' }}>
-                    <Card.Img variant="top" style={{ paddingTop: '10px',borderRadius: '14px' }} src="/banner-devopseduvn-bg.png" />
+                    <Card.Img variant="top" style={{ paddingTop: '10px',borderRadius: '14px' }} src={assetUrl("/banner-devopseduvn-bg.png")} />
                     <Card.Body>
                         <Card.Text>
                             <label>

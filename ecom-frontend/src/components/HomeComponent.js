@@ -10,6 +10,7 @@ import { Card } from "react-bootstrap";
 import 'react-toastify/dist/ReactToastify.css';
 import { Row, Col } from "react-bootstrap";
 import { Facebook } from "@mui/icons-material";
+import { assetUrl } from "../helpers/assetUrl";
 
 const categories = [
   { name: "Thời Trang Nam", image: "/thoi-trang-nam.png" },
@@ -120,19 +121,19 @@ export default function Home() {
       <Box className="text-center my-4">
         <Carousel>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-4.png" alt="Slide 4" />
+            <img className="d-block w-100 img-fluid" src={assetUrl("slide-4.png")} alt="Slide 4" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-0.png" alt="Slide 0" />
+            <img className="d-block w-100 img-fluid" src={assetUrl("slide-0.png")} alt="Slide 0" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-1.png" alt="Slide 1" />
+            <img className="d-block w-100 img-fluid" src={assetUrl("slide-1.png")} alt="Slide 1" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-2.png" alt="Slide 2" />
+            <img className="d-block w-100 img-fluid" src={assetUrl("slide-2.png")} alt="Slide 2" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-3.png" alt="Slide 3" />
+            <img className="d-block w-100 img-fluid" src={assetUrl("slide-3.png")} alt="Slide 3" />
           </Carousel.Item>
         </Carousel>
       </Box>
@@ -160,7 +161,7 @@ export default function Home() {
           {displayedCategories.map((category, index) => (
             <Grid item xs={6} sm={4} md={2} key={index} className="text-center">
               <img
-                src={category.image}
+                src={assetUrl(category.image)}
                 alt={category.name}
                 className="rounded-circle mb-2 img-fluid"
               />
@@ -184,7 +185,7 @@ export default function Home() {
                                 <Card className="product-card">
                                     <Card.Img 
                                         variant="top" 
-                                        src={`/${productImageMap[product.name] || "placeholder.png"}`}
+                                        src={assetUrl(productImageMap[product.name] || "placeholder.png")}
                                         onClick={() => setActiveProduct(product, index)} 
                                     />
                                     <Card.Body>

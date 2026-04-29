@@ -13,6 +13,7 @@ on:
     branches: [main, develop]
     paths:
       - "ecom-frontend/**"
+      - ".github/workflows/frontend-ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -74,6 +75,7 @@ jobs:
           REACT_APP_USER_API_URL: ${{ env.API_URL }}/user/
           REACT_APP_PRODUCT_API_URL: ${{ env.API_URL }}/product/
           REACT_APP_CART_API_URL: ${{ env.API_URL }}/shopping-cart/
+          REACT_APP_BUILD_ID: ${{ github.sha }}
 
       # --- AWS credentials ---
       - name: Configure AWS credentials
@@ -87,7 +89,8 @@ jobs:
       - name: Sync files to S3
         run: |
           echo "Deploying to $S3_BUCKET..."
-          aws s3 sync build/ s3://${S3_BUCKET} --delete --cache-control "max-age=300, must-revalidate"
+          aws s3 sync build/static/ s3://${S3_BUCKET}/static/ --delete --cache-control "public, max-age=31536000, immutable"
+          aws s3 sync build/ s3://${S3_BUCKET} --delete --exclude "static/*" --cache-control "no-cache, no-store, must-revalidate"
           aws s3 cp build/index.html s3://${S3_BUCKET}/index.html --cache-control "no-cache, no-store, must-revalidate"
 
       # --- Purge Cloudflare cache (avoid stale images after deploy) ---

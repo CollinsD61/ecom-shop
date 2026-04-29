@@ -24,6 +24,7 @@ import EventBus from "./common/EventBus";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProfileEditComponent from "./components/ProfileEditComponent";
+import { assetUrl } from "./helpers/assetUrl";
 
 class App extends Component {
   constructor(props) {
@@ -102,7 +103,7 @@ class App extends Component {
             {/* Logo */}
             <Navbar.Brand as={Link} to="/">
               <img
-                src="/Shop now-logo.png"
+                src={assetUrl("/Shop now-logo.png")}
                 alt="Logo"
                 width="120"
                 height="40"

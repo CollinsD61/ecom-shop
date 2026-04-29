@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { connect } from "react-redux";
 import { register } from "../actions/auth";
+import { assetUrl } from "../helpers/assetUrl";
 
 const required = (value) => {
     if (!value) {
@@ -116,7 +117,7 @@ class Register extends Component {
             <div className="col-md-12">
                 <div className="cardLogin card-container">
                     <img
-                        src="/unlock.png"
+                        src={assetUrl("/unlock.png")}
                         alt="profile-img"
                         className="profile-img-card"
                     />
