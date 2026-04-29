@@ -85,7 +85,8 @@ jobs:
       - name: Sync files to S3
         run: |
           echo "Deploying to $S3_BUCKET..."
-          aws s3 sync build/ s3://${S3_BUCKET} --delete
+          aws s3 sync build/ s3://${S3_BUCKET} --delete --cache-control "max-age=300, must-revalidate"
+          aws s3 cp build/index.html s3://${S3_BUCKET}/index.html --cache-control "no-cache, no-store, must-revalidate"
 
       # --- Summary ---
       - name: Job summary
