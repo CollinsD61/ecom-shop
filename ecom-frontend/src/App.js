@@ -76,11 +76,6 @@ class App extends Component {
         {/* Header Top */}
         <div className="header-top">
           <div>
-            <a href="https://devopsedu.vn/contact/" target="_blank" rel="noopener noreferrer">Trở thành người đóng góp</a>
-            <a href="https://devopsedu.vn/blog/" target="_blank" rel="noopener noreferrer">Tài liệu tham khảo</a>
-            <a href="https://m.me/139689492555066" target="_blank" rel="noopener noreferrer">Liên hệ</a>
-          </div>
-          <div>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Notifications /></button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Help /></button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language /> Tiếng Việt</button>
