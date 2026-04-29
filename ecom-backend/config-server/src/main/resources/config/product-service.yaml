@@ -10,4 +10,4 @@ spring:
   properties: 
    hibernate:
     format-sql: true
-  
+   
