@@ -17,14 +17,8 @@ ingress:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
     alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
-    # Cognito auth on ALB (fill with real values)
-    alb.ingress.kubernetes.io/auth-type: cognito
-    alb.ingress.kubernetes.io/auth-idp-cognito: '{"userPoolARN":"arn:aws:cognito-idp:ap-southeast-1:123456789012:userpool/ap-southeast-1_xxxxx","userPoolClientID":"xxxxxxxxxxxxxxxxxxxxxxxxxx","userPoolDomain":"your-cognito-domain"}'
-    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
-    alb.ingress.kubernetes.io/auth-scope: openid
   hosts:
     - host: shop.dohoangdevops.io.vn
       paths:
@@ -126,14 +120,6 @@ services:
           remoteRef:
             key: /ecom/prod/user-service/db
             property: password
-        - secretKey: COGNITO_HOSTED_UI_LOGIN_URL
-          remoteRef:
-            key: /ecom/prod/user-service/cognito
-            property: hosted_ui_login_url
-        - secretKey: COGNITO_HOSTED_UI_SIGNUP_URL
-          remoteRef:
-            key: /ecom/prod/user-service/cognito
-            property: hosted_ui_signup_url
 
   product-service:
     enabled: true

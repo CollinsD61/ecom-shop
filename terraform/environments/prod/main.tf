@@ -271,17 +271,7 @@ module "argocd" {
   depends_on = [module.alb_controller]
 }
 
-# ──────────────────────────────────────────────
-# Module: Cognito
-# ──────────────────────────────────────────────
 
-module "cognito" {
-  source = "../../modules/cognito"
-
-  env           = var.env
-  callback_urls = ["https://shop.${var.domain_name}/oauth2/idpresponse"]
-  logout_urls   = ["https://shop.${var.domain_name}"]
-}
 
 # ──────────────────────────────────────────────
 # Module: Secrets Manager
@@ -290,14 +280,12 @@ module "cognito" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  env                          = var.env
-  db_host                      = module.rds.db_address
-  db_port                      = module.rds.db_port
-  db_name                      = module.rds.db_name
-  db_username                  = var.db_username
-  db_password                  = random_password.rds_password.result
-  cognito_hosted_ui_login_url  = module.cognito.hosted_ui_login_url
-  cognito_hosted_ui_signup_url = module.cognito.hosted_ui_signup_url
+  env         = var.env
+  db_host     = module.rds.db_address
+  db_port     = module.rds.db_port
+  db_name     = module.rds.db_name
+  db_username = var.db_username
+  db_password = random_password.rds_password.result
 }
 
 # ──────────────────────────────────────────────
@@ -315,7 +303,6 @@ module "irsa_user_service" {
   secret_arns = [
     module.secrets.service_db_secret_arns["user-service"],
     module.secrets.shared_rds_secret_arn,
-    module.secrets.cognito_secret_arn,
   ]
 }
 

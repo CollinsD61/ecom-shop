@@ -35,15 +35,3 @@ variable "service_names" {
   description = "List of service names that need DB secrets"
   default     = ["user-service", "product-service", "shopping-cart-service"]
 }
-
-variable "cognito_hosted_ui_login_url" {
-  type        = string
-  description = "Cognito hosted UI login URL"
-  default     = ""
-}
-
-variable "cognito_hosted_ui_signup_url" {
-  type        = string
-  description = "Cognito hosted UI signup URL"
-  default     = ""
-}

@@ -66,6 +66,11 @@ resource "helm_release" "argocd" {
     value = "/healthz"
   }
 
+  set {
+    name  = "server.ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/cloudflare-proxied"
+    value = "\"true\""
+  }
+
   # Disable TLS on ArgoCD server (ALB handles TLS termination)
   set {
     name  = "server.extraArgs[0]"

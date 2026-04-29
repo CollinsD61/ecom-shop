@@ -30,21 +30,6 @@ output "rds_endpoint" {
   value       = module.rds.db_endpoint
 }
 
-# Cognito
-output "cognito_user_pool_id" {
-  description = "Cognito User Pool ID"
-  value       = module.cognito.user_pool_id
-}
-
-output "cognito_app_client_id" {
-  description = "Cognito App Client ID"
-  value       = module.cognito.app_client_id
-}
-
-output "alb_auth_idp_cognito_annotation" {
-  description = "JSON annotation for ALB Cognito auth (paste into Helm values)"
-  value       = module.cognito.alb_auth_idp_cognito_annotation
-}
 
 # IRSA Role ARNs
 output "irsa_user_service_role_arn" {

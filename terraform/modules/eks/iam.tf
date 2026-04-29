@@ -72,3 +72,8 @@ resource "aws_iam_role_policy_attachment" "node_ecr_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.node_group.name
 }
+
+resource "aws_iam_role_policy_attachment" "node_secrets" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  role       = aws_iam_role.node_group.name
+}

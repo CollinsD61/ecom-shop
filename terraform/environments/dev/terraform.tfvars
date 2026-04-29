@@ -15,9 +15,9 @@ availability_zones   = ["ap-southeast-1a", "ap-southeast-1b"]
 cluster_name        = "dev-ecom-cluster"
 cluster_version     = "1.29"
 node_instance_types = ["t2.medium"]
-node_desired_size   = 1
+node_desired_size   = 2
 node_min_size       = 1
-node_max_size       = 2
+node_max_size       = 3
 node_disk_size      = 20
 
 # RDS
