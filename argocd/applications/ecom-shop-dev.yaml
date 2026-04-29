@@ -32,9 +32,9 @@ spec:
         - values/dev.yaml
       parameters:
         - name: ingress.enabled
-          value: "false"
-        - name: gatewayApi.enabled
           value: "true"
+        - name: gatewayApi.enabled
+          value: "false"
         - name: gatewayApi.gatewayClass.create
           value: "true"
         - name: gatewayApi.httpRoutes.enabled

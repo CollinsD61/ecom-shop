@@ -17,14 +17,9 @@ ingress:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
     alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
-    # Cognito auth on ALB (fill with real values)
-    alb.ingress.kubernetes.io/auth-type: cognito
-    alb.ingress.kubernetes.io/auth-idp-cognito: '{"userPoolARN":"arn:aws:cognito-idp:ap-southeast-1:123456789012:userpool/ap-southeast-1_devxxxx","userPoolClientID":"devxxxxxxxxxxxxxxxxxxxxxx","userPoolDomain":"your-cognito-domain-dev"}'
-    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
-    alb.ingress.kubernetes.io/auth-scope: openid
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
   hosts:
     - host: api.shop-dev.dohoangdevops.io.vn
       paths:
