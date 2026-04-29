@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import com.techcareer.userservice.entity.ShoppingCart;
 import com.techcareer.userservice.entity.User;
 import com.techcareer.userservice.payload.request.LoginRequest;
@@ -32,21 +36,39 @@ public class UserService {
     RestTemplate restTemplate;
 
     public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
-        String loginHint = cognitoHostedUiLoginUrl == null || cognitoHostedUiLoginUrl.isBlank()
-                ? "Cognito Hosted UI login URL is not configured."
-                : "Login via Cognito Hosted UI: " + cognitoHostedUiLoginUrl;
-
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body(new MessageResponse("Local signin is disabled. " + loginHint));
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Simple plain-text password check since Spring Security is removed
+            if (user.getPassword().equals(loginRequest.getPassword())) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("accessToken", "local-jwt-token-for-" + user.getUsername());
+                response.put("id", user.getId());
+                response.put("username", user.getUsername());
+                response.put("email", user.getEmail());
+                return ResponseEntity.ok(response);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Error: Invalid username or password!"));
     }
 
     public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
-        String signupHint = cognitoHostedUiSignupUrl == null || cognitoHostedUiSignupUrl.isBlank()
-                ? "Cognito Hosted UI signup URL is not configured."
-                : "Signup via Cognito Hosted UI: " + cognitoHostedUiSignupUrl;
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
 
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body(new MessageResponse("Local signup is disabled. " + signupHint));
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // Create new user's account
+        User user = new User(signUpRequest.getUsername(),
+                signUpRequest.getEmail(),
+                signUpRequest.getPassword()); // Storing plaintext for simplicity as requested
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
     public ResponseEntity<?> deleteUser(Long userId) {
