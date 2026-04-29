@@ -32,8 +32,8 @@ INTERNET --> Cloudflare (CDN) --> S3 (React Static Hosting)
               AWS ALB (public subnet, internet-facing)
                    |
      ┌─────────────┴──────────────┐
-     │      Gateway API           │
-     │ GatewayClass / Gateway / HTTPRoute │
+     │      ALB Ingress Controller  │
+     │ Ingress rules (path-based) │
      │                            │
      │ /api/user/*      → user    │
      │ /api/product/*   → product │
@@ -61,8 +61,8 @@ flowchart LR
     Browser["Browser (React)"] -->|HTML/JS| CF[Cloudflare]
     CF --> S3[Amazon S3 Static Host]
     Browser -->|API Requests| CF
-    CF --> G[ALB / Gateway]
-    G --> H[HTTPRoute Rules]
+    CF --> G[ALB / Ingress]
+    G --> H[Ingress Rules]
     H -->|"/api/user/*"| US[user-service Pod]
     H -->|"/api/product/*"| PS[product-service Pod]
     H -->|"/api/shopping-cart/*"| CS[shopping-cart-service Pod]
@@ -178,7 +178,7 @@ Kubernetes Service (ClusterIP) tu dong dang ky DNS record:
 
 - RDS nam trong private subnets (khong public IP), toi thieu 2 AZ.
 - RDS nam trong DB subnet group rieng (gom cac private subnets).
-- ALB/Gateway nam o public subnets; EKS worker nodes va RDS nam o private subnets.
+- ALB nam o public subnets; EKS worker nodes va RDS nam o private subnets.
 - Service trong EKS ket noi RDS qua private route + Security Group (port 5432).
 - Khong mo inbound RDS ra Internet.
 
@@ -188,7 +188,7 @@ Kubernetes Service (ClusterIP) tu dong dang ky DNS record:
 |---|---|---|
 | `config-server` | On-premise, single point of failure | K8s ConfigMap + Secrets Manager |
 | `discovery-server` (Eureka) | Khong can thiet tren K8s | Kubernetes CoreDNS |
-| `api-gateway` | Thay bang Gateway API | AWS ALB + GatewayClass/Gateway/HTTPRoute |
+| `api-gateway` | Thay bang ALB Ingress | AWS ALB Ingress Controller |
 | `keycloak` + `keycloak-mysql` | Self-hosted auth | Local DB Auth (user-service → RDS) |
 | `@LoadBalanced` | Eureka dependency | Plain RestTemplate + env var |
 | `@EnableFeignClients` | Khong su dung | Da xoa |

@@ -4,7 +4,7 @@
 
 Hệ thống theo mô hình **Cloud-Native Microservices**.
 Frontend được host riêng rẽ trên **Amazon S3** (Static Hosting) thông qua CDN (Cloudflare).
-Backend chạy trên **AWS EKS** sử dụng **Gateway API**.
+Backend chạy trên **AWS EKS** sử dụng **ALB Ingress Controller**.
 
 ```text
 🌐 User (Browser)
@@ -33,10 +33,10 @@ Browser chạy FE app (React)
 +--------------------------------------+
         ↓
 +--------------------------------------+
-| Gateway API (K8s EKS)                |
+| ALB Ingress Controller (K8s EKS)     |
 +--------------------------------------+
         ↓
-[ HTTPRoute: /api/user, /api/product... ]
+[ Ingress: /api/user, /api/product... ]
         ↓
 [ Service (ClusterIP) ]
         ↓

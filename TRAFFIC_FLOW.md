@@ -21,16 +21,15 @@
                                ┌───────────────▼───────────────┴───────────────────────────────────┐
                                │  KUBERNETES CLUSTER (EKS — private subnet)                         │
                                │                                                                     │
-                               │  ┌─── Gateway API Stack ─────────────────────────────────────────┐  │
+                               │  ┌─── ALB Ingress Controller ────────────────────────────────────┐  │
                                │  │                                                                 │  │
-                               │  │  GatewayClass (aws-alb-gateway-class)                        │  │
+                               │  │  Ingress (className: alb)                                      │  │
                                │  │       │                                                       │  │
-                               │  │       ▼                                                       │  │
-                               │  │  Gateway (HTTPS :443)                                        │  │
                                │  │       │                                                       │  │
-                               │  │       ├──► HTTPRoute (user)     path: /api/user/*             │  │
-                               │  │       ├──► HTTPRoute (product)  path: /api/product/*          │  │
-                               │  │       └──► HTTPRoute (cart)     path: /api/shopping-cart/*    │  │
+                               │  │       │                                                       │  │
+                               │  │       ├──► path: /api/user/*             → user-service        │  │
+                               │  │       ├──► path: /api/product/*          → product-service     │  │
+                               │  │       └──► path: /api/shopping-cart/*    → shopping-cart-svc   │  │
                                │  │                                                                 │  │
                                │  └─────────────────────────────────────────────────────────────────┘  │
                                │          │                  │                   │                    │
@@ -60,7 +59,7 @@
 
 ---
 
-## 2. Chi tiết: Gateway API routing (Backend)
+## 2. Chi tiết: ALB Ingress routing (Backend)
 
 ```mermaid
 flowchart TD
@@ -69,12 +68,11 @@ flowchart TD
     ALB["⚡ AWS ALB\n(internet-facing)\npublic subnet"]
 
     subgraph EKS ["☸️ EKS Cluster — private subnet"]
-        GC["GatewayClass\naws-alb-gateway-class"]
-        GW["Gateway\nlistener: HTTPS :443\nhostname: shop.dohoangdevops.io.vn"]
+        ING["Ingress\nclassName: alb\nhost: api-dev.dohoangdevops.io.vn"]
 
-        HR_U["HTTPRoute: user\npath prefix: /api/user/*\n→ backendRef: user-service:5865"]
-        HR_P["HTTPRoute: product\npath prefix: /api/product/*\n→ backendRef: product-service:5861"]
-        HR_C["HTTPRoute: cart\npath prefix: /api/shopping-cart/*\n→ backendRef: shopping-cart-service:5863"]
+        HR_U["path: /api/user/*\n→ user-service:5865"]
+        HR_P["path: /api/product/*\n→ product-service:5861"]
+        HR_C["path: /api/shopping-cart/*\n→ shopping-cart-service:5863"]
 
         SVC_U["K8s Service\nuser-service\ntype: ClusterIP\nport: 5865"]
         SVC_P["K8s Service\nproduct-service\ntype: ClusterIP\nport: 5861"]
@@ -87,9 +85,8 @@ flowchart TD
 
     Browser -->|HTTPS /api/*| CF
     CF -->|Forward| ALB
-    ALB -->|"AWS LBC"| GC
-    GC --> GW
-    GW --> HR_U & HR_P & HR_C
+    ALB -->|"AWS LBC"| ING
+    ING --> HR_U & HR_P & HR_C
     HR_U --> SVC_U
     HR_P --> SVC_P
     HR_C --> SVC_C
@@ -97,8 +94,7 @@ flowchart TD
     SVC_P -->|"kube-proxy"| POD_P1
     SVC_C -->|"kube-proxy"| POD_C1
 
-    style GC fill:#ff9900,color:#000
-    style GW fill:#ff9900,color:#000
+    style ING fill:#ff9900,color:#000
     style HR_U fill:#232f3e,color:#fff
     style HR_P fill:#232f3e,color:#fff
     style HR_C fill:#232f3e,color:#fff
@@ -129,8 +125,8 @@ flowchart TD
 | Lớp | Resource K8s | IP Type | Ai dùng |
 |---|---|---|---|
 | **Internet → S3** | N/A | Public IP | Browser lấy static files (HTML/JS/CSS) |
-| **Internet → ALB** | AWS ALB | Public IP | Browser gọi REST API → Gateway |
-| **ALB → Pod** | Gateway + HTTPRoute | Trực tiếp Pod IP | ALB gọi thẳng Pod |
+| **Internet → ALB** | AWS ALB | Public IP | Browser gọi REST API → Ingress |
+| **ALB → Pod** | Ingress + path rules | Trực tiếp Pod IP | ALB gọi thẳng Pod |
 | **Pod → Pod** | K8s Service + CoreDNS | Cluster-internal IP | service-to-service calls |
 | **Pod → RDS** | DNS endpoint RDS | Private VPC IP | JPA/JDBC connection |
 | **Pod → Secrets Manager**| ExternalSecret + IRSA | AWS API | External Secrets Operator |
