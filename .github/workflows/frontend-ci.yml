@@ -41,10 +41,12 @@ jobs:
           if [ "$BRANCH" = "main" ]; then
             echo "S3_BUCKET=shop.dohoangdevops.io.vn" >> $GITHUB_ENV
             echo "API_URL=https://api.shop.dohoangdevops.io.vn/api" >> $GITHUB_ENV
+            echo "APP_URL=https://shop.dohoangdevops.io.vn" >> $GITHUB_ENV
             echo "ENV_NAME=Production" >> $GITHUB_ENV
           else
             echo "S3_BUCKET=shop-dev.dohoangdevops.io.vn" >> $GITHUB_ENV
             echo "API_URL=https://api.shop-dev.dohoangdevops.io.vn/api" >> $GITHUB_ENV
+            echo "APP_URL=https://shop-dev.dohoangdevops.io.vn" >> $GITHUB_ENV
             echo "ENV_NAME=Development" >> $GITHUB_ENV
           fi
 
@@ -88,6 +90,35 @@ jobs:
           aws s3 sync build/ s3://${S3_BUCKET} --delete --cache-control "max-age=300, must-revalidate"
           aws s3 cp build/index.html s3://${S3_BUCKET}/index.html --cache-control "no-cache, no-store, must-revalidate"
 
+      # --- Purge Cloudflare cache (avoid stale images after deploy) ---
+      - name: Purge Cloudflare cache
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ZONE_NAME: ${{ env.S3_BUCKET }}
+        run: |
+          echo "Purging Cloudflare cache for zone: ${ZONE_NAME}"
+
+          ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${ZONE_NAME}&status=active" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" | jq -r '.result[0].id')
+
+          if [ -z "${ZONE_ID}" ] || [ "${ZONE_ID}" = "null" ]; then
+            echo "::warning::Cloudflare zone not found for ${ZONE_NAME}. Skip cache purge."
+            exit 0
+          fi
+
+          RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+
+          echo "${RESPONSE}" | jq .
+          if [ "$(echo "${RESPONSE}" | jq -r '.success')" != "true" ]; then
+            echo "::error::Cloudflare purge failed."
+            exit 1
+          fi
+
       # --- Summary ---
       - name: Job summary
         run: |
@@ -96,5 +127,6 @@ jobs:
           echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Environment | \`${{ env.ENV_NAME }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| S3 Bucket | \`${{ env.S3_BUCKET }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend URL | \`${{ env.APP_URL }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| API Endpoint | \`${{ env.API_URL }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Branch | \`${GITHUB_REF_NAME}\` |" >> $GITHUB_STEP_SUMMARY
