@@ -14,6 +14,7 @@ terraform/
 │   ├── alb_controller/         # AWS Load Balancer Controller (Helm)
 │   ├── external_dns/           # External DNS với Cloudflare (Helm)
 │   ├── argocd/                 # ArgoCD GitOps (Helm)
+│   ├── cognito/                # AWS Cognito User Pool + App Client
 │   ├── secrets/                # AWS Secrets Manager entries
 │   └── irsa/                   # IAM Roles for Service Accounts (reusable)
 │

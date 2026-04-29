@@ -28,8 +28,10 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.env}-public-subnet-${count.index + 1}"
-    Environment = var.env
+    Name                                            = "${var.env}-public-subnet-${count.index + 1}"
+    Environment                                     = var.env
+    "kubernetes.io/role/elb"                        = "1"
+    "kubernetes.io/cluster/${var.env}-ecom-cluster" = "shared"
   }
 }
 
@@ -41,8 +43,10 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name        = "${var.env}-private-subnet-${count.index + 1}"
-    Environment = var.env
+    Name                                            = "${var.env}-private-subnet-${count.index + 1}"
+    Environment                                     = var.env
+    "kubernetes.io/role/internal-elb"               = "1"
+    "kubernetes.io/cluster/${var.env}-ecom-cluster" = "shared"
   }
 }
 
@@ -52,17 +56,17 @@ locals {
 }
 
 resource "aws_eip" "nat" {
-  count  = locals.nat_gateway_count
+  count  = local.nat_gateway_count
   domain = "vpc"
 
   tags = {
-    Name        = "${var.env}-nat-eip"
+    Name        = "${var.env}-nat-eip-${count.index + 1}"
     Environment = var.env
   }
 }
 
 resource "aws_nat_gateway" "this" {
-  count         = locals.nat_gateway_count
+  count         = local.nat_gateway_count
   allocation_id = aws_eip.nat[count.index].id
 
   subnet_id = aws_subnet.public[count.index].id
@@ -115,7 +119,7 @@ resource "aws_route" "private_to_nat" {
   # Logic: 
   # - Ở Dev: local.nat_gateway_count = 1 -> Cả 2 Route Table đều trỏ về NAT[0]
   # - Ở Prod: local.nat_gateway_count = 2 -> RT[0] trỏ về NAT[0], RT[1] trỏ về NAT[1]
-  nat_gateway_id = aws_nat_gateway.this[min(count.index, locals.nat_gateway_count - 1)].id
+  nat_gateway_id = aws_nat_gateway.this[min(count.index, local.nat_gateway_count - 1)].id
 }
 
 # attach private subnet to route table
