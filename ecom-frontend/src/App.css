@@ -73,18 +73,34 @@ label {
   font-weight: 400;
 }
 
-.header-top a,
-.header-top button {
+.header-top-left {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-top-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.header-top-right a,
+.header-top-right button {
   color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  margin-left: 20px;
+  margin-left: 0;
   transition: color var(--transition);
   font-size: 11px;
   letter-spacing: 0.1em;
 }
 
-.header-top a:hover,
-.header-top button:hover {
+.header-top-right a:hover,
+.header-top-right button:hover {
   color: var(--color-gold-light);
 }
 
@@ -558,9 +574,19 @@ footer.bg-light .text-dark:hover {
     gap: 4px;
   }
 
-  .header-top a,
-  .header-top button {
-    margin-left: 8px;
+  .header-top-left {
+    flex-basis: 100%;
+  }
+
+  .header-top-right {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .header-top-right a,
+  .header-top-right button {
+    margin-left: 0;
     font-size: 10px;
   }
 

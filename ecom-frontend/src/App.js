@@ -75,9 +75,10 @@ class App extends Component {
         <div className="header-container">
         {/* Header Top */}
         <div className="header-top">
-          <div>
-            <span>Ưu đãi mỗi ngày</span>
+          <div className="header-top-left">
+            Ưu đãi hôm nay: Miễn phí ship đơn từ 299K
           </div>
+          <div className="header-top-right">
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Notifications /></button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Help /></button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language /> Tiếng Việt</button>
