@@ -76,6 +76,8 @@ class App extends Component {
         {/* Header Top */}
         <div className="header-top">
           <div>
+            <span>Ưu đãi mỗi ngày</span>
+          </div>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Notifications /></button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Help /></button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language /> Tiếng Việt</button>
