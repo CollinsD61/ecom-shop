@@ -26,7 +26,7 @@ ingress:
     alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
     alb.ingress.kubernetes.io/auth-scope: openid
   hosts:
-    - host: shop-dev.dohoangdevops.io.vn
+    - host: api.shop-dev.dohoangdevops.io.vn
       paths:
         - path: /api/user
           pathType: Prefix
@@ -47,7 +47,7 @@ httpRoute:
     - name: gateway
       sectionName: http
   hostnames:
-    - chart-example.local
+    - api.shop-dev.dohoangdevops.io.vn
   rules:
     - matches:
         - path:
