@@ -60,7 +60,7 @@ services:
     enabled: true
     replicaCount: 1
     image:
-      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/user-service
+      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/user-service
       tag: dev-latest
       pullPolicy: IfNotPresent
     containerPort: 5865
@@ -139,7 +139,7 @@ services:
     enabled: true
     replicaCount: 1
     image:
-      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/product-service
+      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/product-service
       tag: dev-latest
       pullPolicy: IfNotPresent
     containerPort: 5861
@@ -210,7 +210,7 @@ services:
     enabled: true
     replicaCount: 1
     image:
-      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/shopping-cart-service
+      repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/shopping-cart-service
       tag: dev-latest
       pullPolicy: IfNotPresent
     containerPort: 5863
