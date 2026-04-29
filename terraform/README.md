@@ -14,7 +14,6 @@ terraform/
 │   ├── alb_controller/         # AWS Load Balancer Controller (Helm)
 │   ├── external_dns/           # External DNS với Cloudflare (Helm)
 │   ├── argocd/                 # ArgoCD GitOps (Helm)
-│   ├── cognito/                # AWS Cognito User Pool + App Client
 │   ├── secrets/                # AWS Secrets Manager entries
 │   └── irsa/                   # IAM Roles for Service Accounts (reusable)
 │
@@ -52,27 +51,6 @@ terraform init
 terraform plan -var="cloudflare_api_token=YOUR_CF_TOKEN"
 terraform apply -var="cloudflare_api_token=YOUR_CF_TOKEN"
 ```
-
-### Bước 2.1 (khuyen nghi): 1 lenh apply + tu dong sync Cognito annotation vao Helm values
-
-```powershell
-# Cach 1: truyen token qua environment variable
-$env:TF_VAR_cloudflare_api_token="YOUR_CF_TOKEN"
-./terraform/scripts/apply-env-and-sync-cognito.ps1 -Environment dev
-
-# Cach 2: truyen token truc tiep
-./terraform/scripts/apply-env-and-sync-cognito.ps1 -Environment prod -CloudflareApiToken "YOUR_CF_TOKEN"
-
-# Cach 3 (local): tao file .env.local o repo root
-# TF_VAR_cloudflare_api_token=YOUR_CF_TOKEN
-# Script se tu dong doc .env.local va khong can nhap token moi lan
-./terraform/scripts/apply-env-and-sync-cognito.ps1 -Environment dev
-```
-
-Script nay se:
-- Chay terraform init/apply cho environment da chon
-- Lay output alb_auth_idp_cognito_annotation
-- Tu dong cap nhat vao ecom-shop-chart/values/<env>.yaml
 
 ### Bước 3: Cấu hình kubectl
 

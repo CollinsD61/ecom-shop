@@ -7,9 +7,9 @@ Tai lieu nay mo ta kien truc cua he thong ecom-shop tren AWS EKS (cloud-native):
 - **Khong dung** `api-gateway` trong codebase.
 - **Khong dung** `discovery-server` (Eureka) — thay bang **Kubernetes DNS (CoreDNS)**.
 - **Khong dung** `config-server` (Spring Cloud Config) — thay bang **Kubernetes ConfigMap** (non-sensitive) + **AWS Secrets Manager** (sensitive).
-- **Khong dung** `keycloak` + `keycloak-mysql` — thay bang **AWS Cognito**.
-- Su dung `Kubernetes Gateway API` (`GatewayClass` / `Gateway` / `HTTPRoute`) de route traffic.
-- Su dung `Cognito` (OIDC) cho auth o lop edge (ALB/Gateway).
+- **Khong dung** `keycloak` + `keycloak-mysql` — **khong dung** AWS Cognito — su dung **Local Database Auth** (user-service luu user vao RDS).
+- Su dung `AWS ALB Ingress Controller` de route traffic.
+- Xac thuc nguoi dung xu ly **trong ung dung** (user-service), luu thong tin user truc tiep vao **RDS PostgreSQL**.
 - Trien khai bang `ArgoCD` theo GitOps, image luu tren `ECR`.
 - Su dung `IRSA` + `External Secrets Operator` de cap secrets vao Kubernetes.
 
@@ -49,8 +49,8 @@ INTERNET --> Cloudflare (CDN) --> S3 (React Static Hosting)
      └───────────────────────────────────────────────┘
 
 ECR repos: user-service | product-service | shopping-cart-service
-Secrets Manager: /ecom/{env}/{service}/db, /ecom/{env}/user-service/cognito
-Cognito User Pool: edge auth via Gateway
+Secrets Manager: /ecom/{env}/{service}/db
+Auth: Local DB Auth (user-service → RDS PostgreSQL)
 ArgoCD: GitOps pull from GitHub → sync to EKS
 ```
 
@@ -77,38 +77,34 @@ Request flow chi tiet:
 
 [User Browser (chay React app)]
     |
-    | 1) HTTPS request (GET/POST /api/*)
+    | 1) HTTP request (GET/POST /api/*)
     v
 [Cloudflare DNS / CDN]
     |
-    | 2) DNS resolve → Gateway endpoint
+    | 2) DNS resolve → ALB endpoint
     v
-[Gateway (HTTPS :443)]
+[ALB (HTTP :80)]
     |
-    | 3) Check authentication session/token
-    |    - Chua auth → redirect Cognito Hosted UI
+    | 3) Ingress rules route theo path
     v
-[Amazon Cognito Hosted UI]
+[Ingress Rules]
     |
-    | 4) User login thanh cong → return token/session
-    v
-[Gateway + HTTPRoute Rules]
-    |
-    | 5) Route theo path:
+    | 4) Route theo path:
     |    /api/user/*           → user-service (ClusterIP :5865)
     |    /api/product/*        → product-service (ClusterIP :5861)
     |    /api/shopping-cart/*  → shopping-cart-service (ClusterIP :5863)
     v
 [Service Pod trong EKS private subnet]
     |
-    | 6) Xu ly business logic
+    | 5) Xu ly business logic
+    |    user-service xu ly dang ky/dang nhap → luu vao RDS
     |    Goi service khac qua Kubernetes DNS (http://service-name:port)
     v
 [Amazon RDS PostgreSQL - private subnet]
     |
-    | 7) Query/Update data
+    | 6) Query/Update data
     v
-[Response] → Gateway → Cloudflare → User Browser
+[Response] → ALB → Cloudflare → User Browser
 ```
 
 ### 2.3 Cau hinh va Secrets — Thay the Config Server
@@ -193,7 +189,7 @@ Kubernetes Service (ClusterIP) tu dong dang ky DNS record:
 | `config-server` | On-premise, single point of failure | K8s ConfigMap + Secrets Manager |
 | `discovery-server` (Eureka) | Khong can thiet tren K8s | Kubernetes CoreDNS |
 | `api-gateway` | Thay bang Gateway API | AWS ALB + GatewayClass/Gateway/HTTPRoute |
-| `keycloak` + `keycloak-mysql` | Self-hosted auth | AWS Cognito |
+| `keycloak` + `keycloak-mysql` | Self-hosted auth | Local DB Auth (user-service → RDS) |
 | `@LoadBalanced` | Eureka dependency | Plain RestTemplate + env var |
 | `@EnableFeignClients` | Khong su dung | Da xoa |
 | `spring-cloud-*` dependencies | Khong can nua | spring-boot-starter-actuator |
@@ -206,7 +202,6 @@ Quy uoc ten secret (dung environment `{env}`):
 - `/ecom/{env}/user-service/db` → `username`, `password`, `jdbc_url`
 - `/ecom/{env}/product-service/db` → `username`, `password`, `jdbc_url`
 - `/ecom/{env}/shopping-cart-service/db` → `username`, `password`, `jdbc_url`
-- `/ecom/{env}/user-service/cognito` → `hosted_ui_login_url`, `hosted_ui_signup_url`
 
 IRSA mapping:
 
@@ -224,7 +219,6 @@ IRSA mapping:
 | `alb_controller` | AWS Load Balancer Controller (Helm) |
 | `external_dns` | External DNS (Cloudflare integration) |
 | `argocd` | ArgoCD (GitOps CD) |
-| `cognito` | Cognito User Pool + App Client |
 | `secrets` | AWS Secrets Manager entries |
 | `irsa` | IAM Roles for Service Accounts |
 | `ecr` | Elastic Container Registry |
