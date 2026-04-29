@@ -118,22 +118,22 @@ export default function Home() {
   return (
     <Container>
       {/* Banner */}
-      <Box className="text-center my-4">
+      <Box className="text-center my-4 home-carousel">
         <Carousel>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src={assetUrl("slide-4.png")} alt="Slide 4" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-4.png")} alt="Slide 4" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src={assetUrl("slide-0.png")} alt="Slide 0" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-0.png")} alt="Slide 0" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src={assetUrl("slide-1.png")} alt="Slide 1" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-1.png")} alt="Slide 1" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src={assetUrl("slide-2.png")} alt="Slide 2" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-2.png")} alt="Slide 2" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src={assetUrl("slide-3.png")} alt="Slide 3" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-3.png")} alt="Slide 3" />
           </Carousel.Item>
         </Carousel>
       </Box>
@@ -163,7 +163,7 @@ export default function Home() {
               <img
                 src={assetUrl(category.image)}
                 alt={category.name}
-                className="rounded-circle mb-2 img-fluid"
+                className="rounded-circle mb-2 img-fluid category-image"
               />
               <Typography>{category.name}</Typography>
             </Grid>
