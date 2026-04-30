@@ -1,22 +1,10 @@
-/* ============================================================
-   SHOP NOW — Luxury Editorial Design System
-   Palette: Deep Teal (#0d3b3e) + Warm Gold (#c9a959) + Ivory (#faf8f4)
-   Fonts: Playfair Display (headings) + Outfit (body)
-   ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&display=swap');
-
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  --color-teal: #ee4d2d; /* Shopee Orange-Red or stay with Purple? User said Purple background for header */
-  --color-purple-shopee: #9333ea; /* Existing purple */
-  --color-teal-light: #c026d3;
-  --color-gold: #ff5722; /* Shopee-like orange for accent */
-  --color-ivory: #EACAFF; /* New Global Background */
-  --color-lavender-light: #F3E5F5;
-  --color-border: rgba(255, 255, 255, 0.2);
+  --color-purple-shopee: #9370DB; /* Medium Slate Blue */
+  --color-purple-hover: #8A2BE2;
+  --color-ivory: #FDFBFF; /* Very light purple background */
   --font-body: 'Be Vietnam Pro', 'Inter', sans-serif;
-  --transition: 0.25s ease;
+  --transition: 0.3s ease;
 }
 
 /* ---------- Global Reset ---------- */
@@ -30,630 +18,188 @@ body {
 /* ---------- Unified Purple Header ---------- */
 .header-container {
   background-color: var(--color-purple-shopee);
-  color: #fff;
+  color: #FFFFFF !important;
   padding: 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  box-shadow: none;
 }
 
 .header-top {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 4px 60px;
+  padding: 8px 60px;
   font-size: 13px;
-  font-weight: 300;
+  border-bottom: none;
 }
 
-.header-top-left, .header-top-right {
+.header-top-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .header-top a, .header-top button {
-  color: #fff !important;
+  color: #FFFFFF !important;
   text-decoration: none;
-  font-weight: 300;
-  font-size: 13px;
-  transition: opacity var(--transition);
-  display: flex;
+  font-weight: 400;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  transition: opacity var(--transition);
 }
 
-.header-top a:hover {
+.header-top a:hover, .header-top button:hover {
   opacity: 0.8;
+}
+
+/* ---------- Logo Design ---------- */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none !important;
+  transition: all var(--transition);
+}
+
+.logo-image {
+  height: 40px;
+  width: auto;
+}
+
+.logo-text {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #FFFFFF !important;
+  letter-spacing: -0.5px;
+  transition: text-shadow var(--transition);
+}
+
+.logo-container:hover {
+  transform: scale(1.05);
+}
+
+.logo-container:hover .logo-text {
+  text-shadow: 0 0 8px #FFFFFF;
 }
 
 /* ---------- Main Navbar Overrides ---------- */
 .navbar {
   background-color: transparent !important;
-  padding: 10px 60px 5px !important;
-  border-bottom: none !important;
+  padding: 15px 60px 15px !important;
 }
 
-.navbar-brand {
-  padding: 0;
-  margin-right: 40px;
-}
-
-/* ---------- Search Bar (Shopee Style) ---------- */
+/* ---------- Search Bar ---------- */
 .search-container-shopee {
   flex: 1;
   max-width: 800px;
+  margin: 0 40px;
 }
 
 .search-form {
   display: flex;
-  background: #fff;
+  background: #FFFFFF;
   padding: 3px;
-  border-radius: 2px;
-  width: 100%;
-  margin: 0;
+  border-radius: 4px;
 }
 
 .search-form input {
   flex: 1;
   border: none;
-  padding: 8px 15px;
+  padding: 10px 15px;
   outline: none;
   font-size: 14px;
-  color: #333;
 }
 
 .search-button {
-  background-color: var(--color-purple-shopee); /* Darker purple or orange */
-  color: #fff !important;
-  border: none;
-  border-radius: 2px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity var(--transition);
-}
-
-.search-button:hover {
-  opacity: 0.9;
   background-color: var(--color-purple-shopee) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  padding: 0 20px !important;
 }
 
-/* ---------- Keywords (Sub-header) ---------- */
+/* ---------- Keywords ---------- */
 .search-keywords {
   display: flex;
-  gap: 12px;
-  margin-top: 5px;
-  padding-left: 5px;
+  gap: 15px;
+  margin-top: 8px;
 }
 
 .search-keywords a {
-  color: rgba(255, 255, 255, 0.9);
+  color: #FFFFFF !important;
   text-decoration: none;
   font-size: 12px;
-  font-weight: 300;
+  opacity: 0.9;
 }
 
-.search-keywords a:hover {
-  color: #fff;
-}
-
-/* ---------- Cart Icon ---------- */
-.nav-icons {
-  margin-left: 40px;
-}
-
-.nav-icons a {
-  color: #fff !important;
-}
-
-/* ---------- Footer Overrides for new background ---------- */
-footer.bg-light {
-  background-color: var(--color-purple-shopee) !important;
-}
-
-/* ============================================================
-   LOGIN / REGISTER CARDS
-   ============================================================ */
-.card-container.cardLogin {
-  max-width: 440px;
-  margin: 60px auto;
-  padding: 48px 40px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
-
-.cardLogin {
-  background: #fff;
-  padding: 44px 36px;
-  margin: 0 auto 25px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-border);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Decorative top accent bar */
-.cardLogin::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-teal), var(--color-gold));
-}
-
-.cardLogin label {
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
-  display: block;
-  color: var(--color-muted);
-}
-
-.cardLogin .form-control {
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-size: 14px;
-  font-family: var(--font-body);
-  background: var(--color-ivory);
-  transition: all var(--transition);
-}
-
-.cardLogin .form-control:focus {
-  border-color: var(--color-teal);
-  box-shadow: 0 0 0 3px rgba(13, 59, 62, 0.08);
-  outline: none;
-  background: #fff;
-}
-
-.cardLogin .btn-primary {
-  background: linear-gradient(135deg, var(--color-teal), var(--color-teal-light));
-  border: none;
-  border-radius: 30px;
-  padding: 13px 36px;
-  font-family: var(--font-body);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 600;
-  font-size: 13px;
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-
-.cardLogin .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(13, 59, 62, 0.25);
-  background: linear-gradient(135deg, var(--color-teal-light), var(--color-teal));
-}
-
-.cardLogin h2 {
-  font-family: var(--font-display);
-  text-align: center;
-  margin-bottom: 32px;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--color-teal);
-  letter-spacing: 0.02em;
-  text-transform: none;
-}
-
-.profile-img-card {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 24px;
-  display: block;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--color-gold);
-  opacity: 0.85;
-  transition: opacity var(--transition);
-}
-
-.cardLogin:hover .profile-img-card {
-  opacity: 1;
-}
-
-/* ============================================================
-   PRODUCT CARDS
-   ============================================================ */
+/* ---------- Product Cards ---------- */
 .product-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  transition: transform var(--transition), box-shadow var(--transition);
-  background: #fff;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.product-card:hover {
-  border-color: var(--color-gold);
-  cursor: pointer;
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
-}
-
-.product-card .card-img-top {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  object-position: center;
+  background: #FFFFFF !important;
+  border: none !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   transition: transform var(--transition);
 }
 
-.product-card:hover .card-img-top {
-  transform: scale(1.03);
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
-.product-card .card-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--color-charcoal);
-}
-
-.product-card .card-subtitle {
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.product-card .card-text {
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-charcoal);
-}
-
-.product-card-body {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.product-card-desc {
-  flex-grow: 1;
-}
-
-.product-card-bottom {
-  margin-top: auto;
-}
-
-/* Price color override — use gold instead of red */
-.product-card .card-text[style*="color: red"],
-.product-card .card-text[style*="color:red"] {
-  color: var(--color-teal) !important;
-  font-weight: 600;
-  font-size: 15px;
-}
-
-/* ============================================================
-   CART
-   ============================================================ */
-.cart-title {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--color-teal);
-}
-
-.cart-container {
-  background-color: #fff;
-  border: 1px solid var(--color-border);
-  padding: 16px;
-  border-radius: var(--radius-md);
-  height: fit-content;
-  box-shadow: var(--shadow-soft);
-}
-
-.cart-item {
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.cart-item:last-child {
-  border-bottom: none;
-}
-
-.total-price-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding: 14px;
-  border: 1.5px solid var(--color-teal);
-  border-radius: var(--radius-sm);
-  background: rgba(13, 59, 62, 0.02);
-}
-
-.total-price {
-  font-weight: 600;
-  font-family: var(--font-display);
-  color: var(--color-teal);
-  font-size: 18px;
-}
-
-/* ============================================================
-   GENERAL UTILITIES
-   ============================================================ */
-.list {
-  text-align: left;
-  max-width: 750px;
-  margin: auto;
-}
-
-.submit-form {
-  max-width: 400px;
-  margin: auto;
-}
-
-.edit-form {
-  max-width: 400px;
-  margin: auto;
-}
-
-.styled-hr {
-  width: 100%;
-  margin-top: 0;
-  border-color: var(--color-border);
-}
-
-/* ============================================================
-   ABOUT CARDS
-   ============================================================ */
-.aboutCard {
-  background: #fff;
-  border: 1px solid var(--color-border);
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: box-shadow var(--transition);
-}
-
-.aboutCard:hover {
-  box-shadow: var(--shadow-hover);
-}
-
-.aboutCard::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background-color: var(--color-gold);
-  opacity: 0.4;
-  transform: scaleY(1);
-  transition: all 0.5s;
-  transform-origin: bottom;
-}
-
-.aboutCard::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background-color: var(--color-teal);
-  transform: scaleY(0);
-  transition: all 0.5s;
-  transform-origin: bottom;
-}
-
-.aboutCard:hover::after {
-  transform: scaleY(1);
-}
-
-.aboutfonts {
-  font-size: 14px;
-  font-family: var(--font-body);
-}
-
-.about-social-list {
-  display: flex;
-  list-style: none;
-  justify-content: center;
-  padding: 10px;
-  color: var(--color-teal);
-  font-size: 19px;
-}
-
-/* ============================================================
-   FOOTER OVERRIDES
-   ============================================================ */
+/* ---------- Footer Redesign ---------- */
 footer.bg-light {
-  background-color: var(--color-teal) !important;
-  color: rgba(255, 255, 255, 0.85) !important;
-  margin-top: 80px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--color-purple-shopee) !important;
+  color: #FFFFFF !important;
+  padding: 50px 0 30px !important;
+  margin: 0;
+  border: none;
+  box-shadow: none;
 }
 
 footer.bg-light h5 {
-  font-family: var(--font-body);
+  color: #FFFFFF !important;
   font-weight: 700;
-  color: var(--color-lavender-light);
-  margin-bottom: 25px;
-  font-size: 18px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  font-size: 15px;
 }
 
-footer.bg-light p,
-footer.bg-light a {
-  color: rgba(255, 255, 255, 0.7) !important;
-  font-family: var(--font-body);
-  text-decoration: none;
-  transition: all var(--transition);
+footer.bg-light a, footer.bg-light p {
+  color: rgba(255,255,255,0.8) !important;
+  text-decoration: none !important;
+  font-size: 14px;
 }
 
 footer.bg-light a:hover {
-  color: #fff !important;
-  transform: translateX(5px);
+  color: #FFFFFF !important;
 }
 
-footer.bg-light .list-unstyled li {
-  margin-bottom: 10px;
+.payment-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: nowrap;
 }
 
-footer.bg-light hr {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+.payment-icons img {
+  height: 25px;
+  width: auto;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  display: block;
 }
 
-footer.bg-light .form-control {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
+.auth-links {
+    font-size: 13px;
+    font-weight: 400;
 }
-
-footer.bg-light .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* ============================================================
-   SECTION HEADINGS (MUI Typography overrides)
-   ============================================================ */
-.MuiTypography-h5 {
-  font-family: var(--font-display) !important;
-  font-weight: 700 !important;
-  color: var(--color-teal) !important;
-  letter-spacing: 0.02em !important;
-  position: relative;
-  display: inline-block;
-  background: linear-gradient(90deg, var(--color-teal), var(--color-gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ============================================================
-   CAROUSEL OVERRIDES
-   ============================================================ */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: rgba(13, 59, 62, 0.5);
-  border-radius: 50%;
-  padding: 18px;
-}
-
-.carousel-indicators [data-bs-target] {
-  background-color: var(--color-teal);
-}
-
-.home-carousel {
-  max-width: 980px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.home-carousel-image {
-  width: 100%;
-  height: clamp(300px, 38vw, 540px);
-  object-fit: cover;
-  object-position: center;
-}
-
-.category-image {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
-
-/* ============================================================
-   RESPONSIVE — Mobile-first adjustments
-   ============================================================ */
-@media (max-width: 768px) {
-  .header-top {
-    padding: 6px 16px;
-    font-size: 10px;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .header-top-left {
-    flex-basis: 100%;
-  }
-
-  .header-top-right {
-    width: 100%;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .header-top-right a,
-  .header-top-right button {
-    margin-left: 0;
-    font-size: 10px;
-  }
-
-  .navbar {
-    padding: 12px 16px;
-  }
-
-  .search-form {
-    width: 100%;
-  }
-
-  .home-carousel-image {
-    height: clamp(220px, 55vw, 320px);
-  }
-
-  .cardLogin {
-    margin: 30px 16px;
-    padding: 32px 24px;
-  }
-
-  .product-card .card-title {
-    font-size: 14px;
-  }
-
-  footer.bg-light {
-    margin-top: 30px;
-  }
-}
-
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.cardLogin {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.product-card {
-  animation: fadeInUp 0.5s ease-out backwards;
-}
-
-.product-card:nth-child(1) { animation-delay: 0.05s; }
-.product-card:nth-child(2) { animation-delay: 0.1s; }
-.product-card:nth-child(3) { animation-delay: 0.15s; }
-.product-card:nth-child(4) { animation-delay: 0.2s; }
-.product-card:nth-child(5) { animation-delay: 0.25s; }
-.product-card:nth-child(6) { animation-delay: 0.3s; }
-.product-card:nth-child(7) { animation-delay: 0.35s; }
-.product-card:nth-child(8) { animation-delay: 0.4s; }
