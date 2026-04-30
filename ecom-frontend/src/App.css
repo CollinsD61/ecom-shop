@@ -3,8 +3,12 @@
   --color-purple-shopee: #9370DB; /* Medium Slate Blue */
   --color-purple-hover: #8A2BE2;
   --color-ivory: #FDFBFF; /* Very light purple background */
+  --color-teal: #20B2AA;
+  --color-teal-light: #48D1CC;
+  --color-muted: #6c757d;
   --font-body: 'Be Vietnam Pro', 'Inter', sans-serif;
   --transition: 0.3s ease;
+  --shadow-soft: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 /* ---------- Global Reset ---------- */
@@ -144,14 +148,101 @@ body {
 .product-card {
   background: #FFFFFF !important;
   border: none !important;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  transition: transform var(--transition);
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+  transition: all var(--transition) !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.1) !important;
+}
+
+.product-card img {
+  height: 220px;
+  object-fit: cover;
+  width: 100%;
+  transition: transform var(--transition);
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+.product-card-body {
+  padding: 1.25rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-grow: 1 !important;
+}
+
+.product-card-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1.25rem !important;
+  min-height: 2.5em;
+}
+
+.product-card-bottom {
+  margin-top: auto;
+}
+
+.product-card-title {
+  text-transform: capitalize;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  margin-bottom: 0.5rem !important;
+  color: #333;
+}
+
+.product-card-subtitle {
+  font-size: 0.85rem !important;
+  margin-bottom: 0.75rem !important;
+  color: var(--color-muted) !important;
+}
+
+.product-card-price {
+  color: var(--color-teal);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1rem !important;
+}
+
+.product-card-button {
+  text-transform: none !important;
+  width: 100% !important;
+  background: linear-gradient(135deg, var(--color-teal), var(--color-teal-light)) !important;
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+  font-weight: 600 !important;
+  box-shadow: var(--shadow-soft) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.product-card-button:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
+}
+
+.category-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid var(--color-purple-shopee);
+  padding: 3px;
+  transition: transform var(--transition);
+}
+
+.category-image:hover {
+  transform: scale(1.1);
 }
 
 /* ---------- Footer Redesign ---------- */

@@ -183,33 +183,25 @@ export default function Home() {
                   src={assetUrl(productImageMap[product.name] || "placeholder.png")}
                 />
                 <Card.Body className="product-card-body">
-                  <Card.Title style={{ textTransform: 'capitalize', fontWeight: 700, fontSize: '1.1rem' }}>
+                  <Card.Title className="product-card-title">
                     {product.name}
                   </Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
+                  <Card.Subtitle className="mb-2 text-muted product-card-subtitle">
                     {product.category}
                   </Card.Subtitle>
-                  <Card.Text className="product-card-desc" style={{ fontSize: '0.9rem', color: 'var(--color-muted)' }}>
+                  <Card.Text className="product-card-desc">
                     {product.description.length > 60
                       ? product.description.substring(0, 60) + "..."
                       : product.description}
                   </Card.Text>
                   <div className="product-card-bottom">
-                    <Card.Text style={{ color: 'var(--color-teal)', fontWeight: 700, fontSize: '1.2rem', marginBottom: '16px' }}>
+                    <Card.Text className="product-card-price">
                       {formatCurrency(product.price)} VNĐ
                     </Card.Text>
                     <Button
                       startIcon={<ShoppingCartRounded />}
                       variant="contained"
-                      style={{ 
-                        textTransform: "none", 
-                        width: "100%", 
-                        background: "linear-gradient(135deg, var(--color-teal), var(--color-teal-light))",
-                        borderRadius: "12px",
-                        padding: "10px 16px",
-                        fontWeight: 600,
-                        boxShadow: "var(--shadow-soft)"
-                      }}
+                      className="product-card-button"
                       onClick={() => addToCart(product)}
                     >
                       Add to Cart
