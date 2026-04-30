@@ -21,3 +21,4 @@ public class WebConfig implements WebMvcConfigurer {
 // trigger workflow
 // trigger argocd core fix
 // trigger namespace fix
+// trigger argocd health wait fix
