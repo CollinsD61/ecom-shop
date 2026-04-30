@@ -206,8 +206,8 @@ jobs:
           # Sync app using --core (direct Kubernetes API access, no port-forward needed)
           argocd app sync "${APP_NAME}" --core --force --prune
 
-          # Doi app healthy
-          argocd app wait "${APP_NAME}" --core --timeout 300
+          # Doi app healthy (chi doi Healthy, bo qua Sync state de tranh bi treo do ServerSideApply OutOfSync)
+          argocd app wait "${APP_NAME}" --core --health --timeout 300
 
           echo "### ✅ ArgoCD Sync Complete" >> $GITHUB_STEP_SUMMARY
           echo "- **App**: ${APP_NAME}" >> $GITHUB_STEP_SUMMARY
