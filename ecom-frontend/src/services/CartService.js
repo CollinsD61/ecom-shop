@@ -22,7 +22,7 @@ class CartService {
     }
 
     create(name) {
-        return http.post(`?name=${name}`, null, { headers: AuthHeader() });
+        return http.post("", null, { params: { name }, headers: AuthHeader() });
     }
 
     delete(cartId) {
