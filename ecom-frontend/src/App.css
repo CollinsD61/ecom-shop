@@ -1,8 +1,8 @@
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  --color-pink-shopee: #ee4d2d; /* Primary Shopee Orange-Pink */
-  --color-pink-gradient: linear-gradient(135deg, #ff6633, #ee4d2d);
-  --color-pink-hover: #d73211;
+  --color-pink-purple: #ff0080; 
+  --color-pink-purple-gradient: linear-gradient(135deg, #ff0080 0%, #7928ca 100%);
+  --color-pink-purple-hover: #e60073;
   --color-ivory: #FDFBFF; /* Very light background */
   --color-teal: #20B2AA;
   --color-teal-light: #48D1CC;
@@ -10,7 +10,7 @@
   --font-body: 'Be Vietnam Pro', 'Inter', sans-serif;
   --transition: 0.3s ease;
   --shadow-soft: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-premium: 0 10px 30px rgba(238, 77, 45, 0.15);
+  --shadow-premium: 0 10px 30px rgba(255, 0, 128, 0.15);
 }
 
 /* ---------- Global Reset ---------- */
@@ -23,13 +23,13 @@ body {
 
 /* ---------- Unified Gradient Header ---------- */
 .header-container {
-  background: var(--color-pink-gradient);
+  background: var(--color-pink-purple-gradient);
   color: #FFFFFF !important;
   padding: 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 15px rgba(121, 40, 202, 0.2);
 }
 
 .header-top {
@@ -126,7 +126,7 @@ body {
 }
 
 .search-button {
-  background: var(--color-pink-gradient) !important;
+  background: var(--color-pink-purple-gradient) !important;
   color: #FFFFFF !important;
   border: none !important;
   padding: 0 20px !important;
@@ -257,7 +257,7 @@ body {
   width: 80px;
   height: 80px;
   object-fit: cover;
-  border: 2px solid var(--color-pink-shopee);
+  border: 2px solid var(--color-pink-purple);
   padding: 3px;
   transition: transform var(--transition);
 }
@@ -268,7 +268,7 @@ body {
 
 /* ---------- Footer Redesign ---------- */
 footer.bg-light {
-  background: var(--color-pink-gradient) !important;
+  background: var(--color-pink-purple-gradient) !important;
   color: #FFFFFF !important;
   padding: 60px 0 30px !important;
   margin: 0;
