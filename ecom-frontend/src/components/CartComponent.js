@@ -76,7 +76,7 @@ const CartComponent = () => {
                     <span className="total-price"> {formatCurrency(totalPrice)} VNĐ</span>
                 </div>
             </ListGroup>
-            <Button variant="primary" className="mt-3" style={{ backgroundColor: "#fd3318", width: "50%", margin: "20px auto 0", display: "block" }}>Thanh toán</Button>
+            <Button variant="primary" className="mt-3" style={{ backgroundColor: "#fb6f92", width: "50%", margin: "20px auto 0", display: "block" }}>Thanh toán</Button>
         </div>
     );
 };

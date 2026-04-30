@@ -30,9 +30,6 @@ class Profile extends Component {
                                 <strong>Email:</strong>
                             </label>{" "}
                             {currentUser.email}
-                            <label>
-                                <strong>Token:</strong> {currentUser.accessToken.substring(0, 20)} ... {currentUser.accessToken.substr(currentUser.accessToken.length - 20)}
-                            </label>{" "}
                         </Card.Text>
                         <div className="d-flex justify-content-md-end">
                             <Link to={"/profile/" + currentUser.id}>

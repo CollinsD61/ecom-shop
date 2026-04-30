@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import { Container, Navbar, Form, FormControl, Button, Row, Col } from "react-bootstrap";
-import { Search, ShoppingCart, Notifications, Help, Language, Facebook, YouTube, Email, Phone, Send, AccountCircle } from "@mui/icons-material";
+import { Search, ShoppingCart, Notifications, Help, Language, Facebook, YouTube, Email, Phone, Send, AccountCircle, Instagram } from "@mui/icons-material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -73,14 +73,24 @@ class App extends Component {
         {/* Font import */}
         <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&display=swap" rel="stylesheet" />
         <div className="header-container">
-        {/* Header Top - Tầng 1 (Tím đậm) */}
+        {/* Header Top - Tầng 1 (Shopee Style) */}
         <div className="header-top">
           <div className="header-top-left">
-            ƯU ĐÃI HÔM NAY: Miễn phí vận chuyển cho đơn hàng từ 299K!
+            <a href="/">Kênh Người Bán</a>
+            <div style={{width:'1px', height:'13px', background:'rgba(255,255,255,0.2)'}}></div>
+            <a href="/">Trở thành Người bán Shopee</a>
+            <div style={{width:'1px', height:'13px', background:'rgba(255,255,255,0.2)'}}></div>
+            <a href="/">Tải ứng dụng</a>
+            <div style={{width:'1px', height:'13px', background:'rgba(255,255,255,0.2)'}}></div>
+            <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
+              Kết nối 
+              <a href="/"><Facebook fontSize="small" /></a>
+              <a href="/"><Instagram fontSize="small" /></a>
+            </div>
           </div>
           <div className="header-top-right">
-            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} title="Thông báo"><Notifications fontSize="small" /></button>
-            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} title="Hỗ trợ"><Help fontSize="small" /></button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} title="Thông báo"><Notifications fontSize="small" /> Thông báo</button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} title="Hỗ trợ"><Help fontSize="small" /> Hỗ trợ</button>
             <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language fontSize="small" /> Tiếng Việt</button>
             {currentUser ? (
               <>
@@ -92,63 +102,62 @@ class App extends Component {
             ) : (
               <>
                 <Link to="/register" className="auth-links">Đăng Ký</Link>
+                <div style={{width:'1px', height:'13px', background:'rgba(255,255,255,0.2)'}}></div>
                 <Link to="/login" className="auth-links">Đăng Nhập</Link>
               </>
             )}
           </div>
         </div>
 
-        {/* Navbar - Tầng 2 (Trắng ánh tím) */}
+        {/* Navbar - Tầng 2 (Shopee Style) */}
         <Navbar expand="lg" className="navbar">
-          <Container fluid style={{padding: '0 60px'}}>
-            {/* Logo logotype 'Ecom-Shop' */}
-            <Navbar.Brand as={Link} to="/" style={{display: 'flex', alignItems: 'center', textDecoration: 'none'}}>
+          <Container fluid style={{padding: '0 60px', display: 'flex', alignItems: 'flex-start'}}>
+            {/* Logo logotype 'Ecom-Shop' - White */}
+            <Navbar.Brand as={Link} to="/" style={{display: 'flex', alignItems: 'center', textDecoration: 'none', marginTop: '5px'}}>
               <div style={{
                 fontFamily: 'var(--font-display)',
                 fontWeight: 800,
-                fontSize: '28px',
-                color: 'var(--color-teal)',
+                fontSize: '32px',
+                color: '#fff',
                 display: 'flex',
                 alignItems: 'center'
               }}>
-                <span style={{color: 'var(--color-gold)', marginRight: '2px'}}>E</span>com-Shop
+                Ecom-Shop
               </div>
             </Navbar.Brand>
 
             {/* Thanh tìm kiếm - Trung tâm & Thu gọn */}
-            <Form className="search-form">
-              <FormControl
-                type="search"
-                placeholder="Tìm kiếm sản phẩm..."
-                aria-label="Search"
-              />
-              <Button className="search-button">
-                <Search />
-              </Button>
-            </Form>
+            <div className="search-container-shopee">
+              <Form className="search-form">
+                <FormControl
+                  type="search"
+                  placeholder="Ecom-Shop bao ship 0đ - Đăng ký ngay!"
+                  aria-label="Search"
+                />
+                <Button className="search-button">
+                  <Search />
+                </Button>
+              </Form>
+              {/* Keywords gợi ý */}
+              <div className="search-keywords">
+                <a href="/">Dép</a>
+                <a href="/">Áo Phông</a>
+                <a href="/">Túi Xách</a>
+                <a href="/">Váy</a>
+                <a href="/">Ốp Điện Thoại</a>
+                <a href="/">Tai Nghe</a>
+                <a href="/">Mỹ Phẩm</a>
+              </div>
+            </div>
 
-            {/* Biểu tượng giỏ hàng & Tài khoản */}
+            {/* Biểu tượng giỏ hàng */}
             <div className="nav-icons">
               <Link to="/cart" title="Giỏ hàng">
-                  <ShoppingCart />
+                  <ShoppingCart style={{fontSize: '28px'}} />
               </Link>
-              {currentUser && (
-                <Link to="/profile" title="Tài khoản">
-                  <AccountCircle />
-                </Link>
-              )}
             </div>
           </Container>
         </Navbar>
-
-        {/* Menu điều hướng ngang */}
-        <div className="nav-menu">
-          <Link to="/" className="nav-menu-item">Thời Trang</Link>
-          <Link to="/" className="nav-menu-item">Điện Tử</Link>
-          <Link to="/" className="nav-menu-item">Làm Đẹp</Link>
-          <Link to="/" className="nav-menu-item">Đồ Gia Dụng</Link>
-          <Link to="/" className="nav-menu-item" style={{color: 'var(--color-gold)'}}>Khuyến Mãi</Link>
-        </div>
         </div>
 
         {/* Nội dung trang */}
