@@ -29,7 +29,7 @@ export default function Home() {
   const itemsPerPage = 6;
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [cartId, setCartId] = useState(null);
-  const [currentProduct, setCurrentProduct] = useState(null);
+  // Removed unused currentProduct state
 
 
   useEffect(() => {
@@ -93,10 +93,7 @@ export default function Home() {
       });
   };
 
-  const setActiveProduct = (product, index) => {
-    setCurrentProduct(product);
-  };
-
+  // Removed unused setActiveProduct
   const formatCurrency = (amount) => {
     const number = Number(amount) || 0;
     return number.toLocaleString("vi-VN");
@@ -186,7 +183,6 @@ export default function Home() {
                 <Card.Img
                   variant="top"
                   src={assetUrl(productImageMap[product.name] || "placeholder.png")}
-                  onClick={() => setActiveProduct(product, index)}
                 />
                 <Card.Body className="product-card-body">
                   <Card.Title style={{ textTransform: 'capitalize' }}>
