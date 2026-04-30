@@ -28,9 +28,9 @@ class AuthVerify extends Component {
         if (user) {
             const decodedJwt = this.parseJwt(user.accessToken);
 
-            if (decodedJwt.exp * 1000 < Date.now()) {
+            if (!decodedJwt || decodedJwt.exp * 1000 < Date.now()) {
                 this.props.logOut();
-                toast("Jwt expired please login again");
+                toast("Session invalid or expired, please login again");
                 // Navigating to the "/login" path
                 this.props.router.navigate("/login");
             }
