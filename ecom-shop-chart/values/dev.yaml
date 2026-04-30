@@ -56,7 +56,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/user-service
-      tag: "123"
+      tag: "develop-latest"
       pullPolicy: IfNotPresent
     containerPort: 5865
     service:
@@ -134,7 +134,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/product-service
-      tag: "123"
+      tag: "develop-latest"
       pullPolicy: IfNotPresent
     containerPort: 5861
     service:
@@ -204,7 +204,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/shopping-cart-service
-      tag: "123"
+      tag: "develop-latest"
       pullPolicy: IfNotPresent
     containerPort: 5863
     service:
