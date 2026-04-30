@@ -145,7 +145,7 @@ jobs:
           done
 
           echo "Updated image tags in ${VALUES_FILE}"
-          yq '.services | to_entries | .[] | {service: .key, tag: .value.image.tag}' "${VALUES_FILE}"
+          yq '.services | to_entries | .[] | {"service": .key, "tag": .value.image.tag}' "${VALUES_FILE}" || true
 
       - name: Commit and push
         run: |
