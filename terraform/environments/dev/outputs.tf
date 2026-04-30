@@ -52,3 +52,13 @@ output "argocd_server_host" {
   description = "ArgoCD server hostname"
   value       = module.argocd.argocd_server_host
 }
+
+output "external_secrets_role_arn" {
+  description = "IRSA role ARN for External Secrets Operator"
+  value       = module.external_secrets.external_secrets_role_arn
+}
+
+output "cluster_secret_store_name" {
+  description = "ClusterSecretStore used by workloads"
+  value       = module.external_secrets.cluster_secret_store_name
+}

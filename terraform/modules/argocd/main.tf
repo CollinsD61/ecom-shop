@@ -58,7 +58,23 @@ resource "helm_release" "argocd" {
 
   set {
     name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/listen-ports"
-    value = "[{\"HTTP\": 80}]"
+    value = var.server_ingress_certificate_arn != "" ? "[{\\\"HTTP\\\":80}\\,{\\\"HTTPS\\\":443}]" : "[{\\\"HTTP\\\":80}]"
+  }
+
+  dynamic "set" {
+    for_each = var.server_ingress_certificate_arn != "" ? [1] : []
+    content {
+      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
+      value = var.server_ingress_certificate_arn
+    }
+  }
+
+  dynamic "set" {
+    for_each = var.server_ingress_certificate_arn != "" && var.server_ingress_ssl_redirect ? [1] : []
+    content {
+      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/ssl-redirect"
+      value = "443"
+    }
   }
 
   set {
@@ -68,7 +84,7 @@ resource "helm_release" "argocd" {
 
   set {
     name  = "server.ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/cloudflare-proxied"
-    value = "\"true\""
+    value = "true"
   }
 
   # Disable TLS on ArgoCD server (ALB handles TLS termination)

@@ -13,6 +13,7 @@ terraform/
 │   ├── ecr/                    # ECR repositories, lifecycle policies
 │   ├── alb_controller/         # AWS Load Balancer Controller (Helm)
 │   ├── external_dns/           # External DNS với Cloudflare (Helm)
+│   ├── external_secrets/       # External Secrets Operator + ClusterSecretStore
 │   ├── argocd/                 # ArgoCD GitOps (Helm)
 │   ├── secrets/                # AWS Secrets Manager entries
 │   └── irsa/                   # IAM Roles for Service Accounts (reusable)
@@ -52,6 +53,14 @@ terraform plan -var="cloudflare_api_token=YOUR_CF_TOKEN"
 terraform apply -var="cloudflare_api_token=YOUR_CF_TOKEN"
 ```
 
+Để bật HTTPS cho ArgoCD qua ALB, truyền thêm ACM certificate ARN:
+
+```bash
+terraform apply \
+  -var="cloudflare_api_token=YOUR_CF_TOKEN" \
+  -var="argocd_acm_certificate_arn=arn:aws:acm:ap-southeast-1:123456789012:certificate/xxxx"
+```
+
 ### Bước 3: Cấu hình kubectl
 
 ```bash
@@ -79,6 +88,8 @@ VPC ──► EKS ──► ALB Controller
   │       │         
   │       ├──► External DNS
   │       │         
+  │       ├──► External Secrets Operator
+  │       │
   │       ├──► ArgoCD
   │       │         
   │       ├──► IRSA (x3 services)

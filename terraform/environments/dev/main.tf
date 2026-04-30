@@ -136,6 +136,18 @@ variable "domain_name" {
   default = "dohoangdevops.io.vn"
 }
 
+variable "argocd_acm_certificate_arn" {
+  type        = string
+  description = "ACM certificate ARN for argocd.<domain> ingress on ALB (optional)"
+  default     = ""
+}
+
+variable "acm_certificate_arn" {
+  type        = string
+  description = "ACM wildcard certificate ARN for backend API ingress on ALB (optional)"
+  default     = ""
+}
+
 # ──────────────────────────────────────────────
 # Providers
 # ──────────────────────────────────────────────
@@ -264,9 +276,10 @@ module "external_dns" {
 module "argocd" {
   source = "../../modules/argocd"
 
-  env                 = var.env
-  cluster_name        = module.eks.cluster_name
-  server_ingress_host = "argocd.${var.domain_name}"
+  env                            = var.env
+  cluster_name                   = module.eks.cluster_name
+  server_ingress_host            = "argocd.${var.domain_name}"
+  server_ingress_certificate_arn = var.argocd_acm_certificate_arn
 
   depends_on = [module.alb_controller]
 }
@@ -286,6 +299,26 @@ module "secrets" {
   db_name     = module.rds.db_name
   db_username = var.db_username
   db_password = random_password.rds_password.result
+}
+
+# ──────────────────────────────────────────────
+# Module: External Secrets Operator
+# ──────────────────────────────────────────────
+
+module "external_secrets" {
+  source = "../../modules/external_secrets"
+
+  env               = var.env
+  cluster_name      = module.eks.cluster_name
+  aws_region        = var.aws_region
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.oidc_provider_url
+  secret_arns = concat(
+    [module.secrets.shared_rds_secret_arn],
+    values(module.secrets.service_db_secret_arns)
+  )
+
+  depends_on = [module.alb_controller]
 }
 
 # ──────────────────────────────────────────────

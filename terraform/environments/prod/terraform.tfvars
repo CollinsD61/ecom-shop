@@ -32,3 +32,6 @@ db_skip_final_snapshot     = false
 
 # Domain
 domain_name = "dohoangdevops.io.vn"
+
+# Optional: enable HTTPS for ArgoCD ALB ingress
+# argocd_acm_certificate_arn = "arn:aws:acm:ap-southeast-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
