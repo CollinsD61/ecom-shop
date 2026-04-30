@@ -209,7 +209,7 @@ IRSA mapping:
 - `sa-product-service` → read `/ecom/{env}/product-service/*` va `/ecom/{env}/shared/*`
 - `sa-shopping-cart-service` → read `/ecom/{env}/shopping-cart-service/*` va `/ecom/{env}/shared/*`
 
-### 2.9 Terraform Modules
+### 2.9 Terraform Modules.
 
 | Module | Chuc nang |
 |---|---|
