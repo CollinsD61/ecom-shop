@@ -131,6 +131,11 @@ variable "cloudflare_api_token" {
   sensitive = true
 }
 
+variable "skip_k8s_addons" {
+  type    = bool
+  default = false
+}
+
 variable "domain_name" {
   type    = string
   default = "dohoangdevops.io.vn"
@@ -233,6 +238,8 @@ module "rds" {
 # ──────────────────────────────────────────────
 
 module "alb_controller" {
+  count = var.skip_k8s_addons ? 0 : 1
+
   source = "../../modules/alb_controller"
 
   env               = var.env
@@ -248,6 +255,8 @@ module "alb_controller" {
 # ──────────────────────────────────────────────
 
 module "external_dns" {
+  count = var.skip_k8s_addons ? 0 : 1
+
   source = "../../modules/external_dns"
 
   env                  = var.env
@@ -263,6 +272,8 @@ module "external_dns" {
 # ──────────────────────────────────────────────
 
 module "argocd" {
+  count = var.skip_k8s_addons ? 0 : 1
+
   source = "../../modules/argocd"
 
   env          = var.env
@@ -293,6 +304,8 @@ module "secrets" {
 # ──────────────────────────────────────────────
 
 module "external_secrets" {
+  count = var.skip_k8s_addons ? 0 : 1
+
   source = "../../modules/external_secrets"
 
   env               = var.env

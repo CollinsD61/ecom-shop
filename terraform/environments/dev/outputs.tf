@@ -50,15 +50,15 @@ output "irsa_shopping_cart_service_role_arn" {
 # ArgoCD
 output "argocd_port_forward_cmd" {
   description = "Command to access ArgoCD UI locally via port-forward"
-  value       = module.argocd.argocd_port_forward_cmd
+  value       = try(module.argocd[0].argocd_port_forward_cmd, null)
 }
 
 output "external_secrets_role_arn" {
   description = "IRSA role ARN for External Secrets Operator"
-  value       = module.external_secrets.external_secrets_role_arn
+  value       = try(module.external_secrets[0].external_secrets_role_arn, null)
 }
 
 output "cluster_secret_store_name" {
   description = "ClusterSecretStore used by workloads"
-  value       = module.external_secrets.cluster_secret_store_name
+  value       = try(module.external_secrets[0].cluster_secret_store_name, null)
 }
