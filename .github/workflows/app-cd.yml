@@ -136,16 +136,15 @@ jobs:
           echo "Updating services to tag ${TAG} in ${VALUES_FILE}"
 
           for SVC in $(echo "$SERVICES" | jq -r '.[]'); do
-            # Service key trong values.yaml: services["<service-name>"].image.tag
-            if ! yq -e ".services[\"${SVC}\"]" "${VALUES_FILE}" >/dev/null; then
-              echo "::error::Service '${SVC}' not found in ${VALUES_FILE}"
-              exit 1
-            fi
+            # Update image tag trực tiếp — yq sẽ tạo key nếu không tồn tại
             yq -i ".services[\"${SVC}\"].image.tag = \"${TAG}\"" "${VALUES_FILE}"
           done
 
-          echo "Updated image tags in ${VALUES_FILE}"
-          yq '.services | to_entries | .[] | {"service": .key, "tag": .value.image.tag}' "${VALUES_FILE}" || true
+          echo "Updated image tags in ${VALUES_FILE}:"
+          for SVC in $(echo "$SERVICES" | jq -r '.[]'); do
+            UPDATED_TAG=$(yq ".services[\"${SVC}\"].image.tag" "${VALUES_FILE}")
+            echo "  ${SVC}: ${UPDATED_TAG}"
+          done
 
       - name: Commit and push
         run: |
