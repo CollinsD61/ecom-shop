@@ -48,9 +48,9 @@ output "irsa_shopping_cart_service_role_arn" {
 }
 
 # ArgoCD
-output "argocd_server_host" {
-  description = "ArgoCD server hostname"
-  value       = module.argocd.argocd_server_host
+output "argocd_port_forward_cmd" {
+  description = "Command to access ArgoCD UI locally via port-forward"
+  value       = module.argocd.argocd_port_forward_cmd
 }
 
 output "external_secrets_role_arn" {

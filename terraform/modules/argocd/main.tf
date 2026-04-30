@@ -15,6 +15,7 @@ resource "kubernetes_namespace" "argocd" {
 
 # ──────────────────────────────────────────────
 # ArgoCD via Helm
+# Access via: kubectl port-forward svc/argocd-server -n argocd 8080:443
 # ──────────────────────────────────────────────
 
 resource "helm_release" "argocd" {
@@ -24,70 +25,13 @@ resource "helm_release" "argocd" {
   version    = var.chart_version
   namespace  = kubernetes_namespace.argocd.metadata[0].name
 
-  # Server configuration
-  set {
-    name  = "server.service.type"
-    value = "ClusterIP"
-  }
-
-  # Ingress for ArgoCD UI via ALB
+  # Ingress disabled — use kubectl port-forward instead
   set {
     name  = "server.ingress.enabled"
-    value = tostring(var.server_ingress_enabled)
+    value = "false"
   }
 
-  set {
-    name  = "server.ingress.ingressClassName"
-    value = "alb"
-  }
-
-  set {
-    name  = "server.ingress.hosts[0]"
-    value = var.server_ingress_host
-  }
-
-  set {
-    name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/scheme"
-    value = "internet-facing"
-  }
-
-  set {
-    name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/target-type"
-    value = "ip"
-  }
-
-  set {
-    name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/listen-ports"
-    value = var.server_ingress_certificate_arn != "" ? "[{\\\"HTTP\\\":80}\\,{\\\"HTTPS\\\":443}]" : "[{\\\"HTTP\\\":80}]"
-  }
-
-  dynamic "set" {
-    for_each = var.server_ingress_certificate_arn != "" ? [1] : []
-    content {
-      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-      value = var.server_ingress_certificate_arn
-    }
-  }
-
-  dynamic "set" {
-    for_each = var.server_ingress_certificate_arn != "" && var.server_ingress_ssl_redirect ? [1] : []
-    content {
-      name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/ssl-redirect"
-      value = "443"
-    }
-  }
-
-  set {
-    name  = "server.ingress.annotations.alb\\.ingress\\.kubernetes\\.io/healthcheck-path"
-    value = "/healthz"
-  }
-
-  set {
-    name  = "server.ingress.annotations.external-dns\\.alpha\\.kubernetes\\.io/cloudflare-proxied"
-    value = "true"
-  }
-
-  # Disable TLS on ArgoCD server (ALB handles TLS termination)
+  # Run server in insecure mode (no self-signed cert issues with port-forward)
   set {
     name  = "server.extraArgs[0]"
     value = "--insecure"

@@ -136,19 +136,6 @@ variable "domain_name" {
   default = "dohoangdevops.io.vn"
 }
 
-variable "argocd_acm_certificate_arn" {
-  type        = string
-  description = "ACM certificate ARN for argocd.<domain> ingress on ALB (optional)"
-  default     = ""
-}
-
-variable "acm_certificate_arn" {
-  type        = string
-  description = "ACM wildcard certificate ARN for backend API ingress on ALB (optional)"
-  default     = ""
-}
-
-
 # ──────────────────────────────────────────────
 # Providers
 # ──────────────────────────────────────────────
@@ -278,9 +265,8 @@ module "external_dns" {
 module "argocd" {
   source = "../../modules/argocd"
 
-  env                    = var.env
-  cluster_name           = module.eks.cluster_name
-  server_ingress_enabled = false
+  env          = var.env
+  cluster_name = module.eks.cluster_name
 
   depends_on = [module.alb_controller]
 }
