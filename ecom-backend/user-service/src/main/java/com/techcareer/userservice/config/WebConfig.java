@@ -19,3 +19,4 @@ public class WebConfig implements WebMvcConfigurer {
 }
 
 // trigger workflow
+// trigger argocd core fix
