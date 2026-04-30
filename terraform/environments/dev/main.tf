@@ -148,11 +148,6 @@ variable "acm_certificate_arn" {
   default     = ""
 }
 
-variable "acm_certificate_arn_us_east_1" {
-  type        = string
-  description = "ACM wildcard cert ARN in us-east-1 for CloudFront (required by AWS)"
-  default     = ""
-}
 
 # ──────────────────────────────────────────────
 # Providers
@@ -162,11 +157,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-# CloudFront requires ACM certificates to be in us-east-1
-provider "aws" {
-  alias  = "us_east_1"
-  region = "us-east-1"
-}
 
 provider "helm" {
   kubernetes {
@@ -288,10 +278,9 @@ module "external_dns" {
 module "argocd" {
   source = "../../modules/argocd"
 
-  env                            = var.env
-  cluster_name                   = module.eks.cluster_name
-  server_ingress_host            = "argocd.${var.domain_name}"
-  server_ingress_certificate_arn = var.argocd_acm_certificate_arn
+  env                    = var.env
+  cluster_name           = module.eks.cluster_name
+  server_ingress_enabled = false
 
   depends_on = [module.alb_controller]
 }
@@ -387,20 +376,4 @@ module "irsa_shopping_cart_service" {
   ]
 }
 
-# ──────────────────────────────────────────────
-# Module: CloudFront (Frontend HTTPS)
-# ──────────────────────────────────────────────
 
-module "cloudfront_frontend" {
-  source = "../../modules/cloudfront"
-
-  providers = {
-    aws = aws.us_east_1
-  }
-
-  env                 = var.env
-  aws_region          = var.aws_region
-  s3_bucket_name      = "shop-${var.env}.${var.domain_name}"
-  domain_name         = "shop-${var.env}.${var.domain_name}"
-  acm_certificate_arn = var.acm_certificate_arn_us_east_1
-}
