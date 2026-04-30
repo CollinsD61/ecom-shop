@@ -1,8 +1,6 @@
 nameOverride: ""
 fullnameOverride: ""
-
 imagePullSecrets: []
-
 # External Secrets Operator integration for AWS Secrets Manager
 externalSecrets:
   enabled: true
@@ -10,7 +8,6 @@ externalSecrets:
   secretStoreRef:
     kind: ClusterSecretStore
     name: aws-secretsmanager
-
 ingress:
   enabled: true
   className: alb
@@ -38,7 +35,6 @@ ingress:
           pathType: Prefix
           service: shopping-cart-service
   tls: []
-
 # Optional Gateway API HTTPRoute support (disabled by default)
 httpRoute:
   enabled: false
@@ -54,14 +50,13 @@ httpRoute:
             type: PathPrefix
             value: /api/user
       backendService: user-service
-
 services:
   user-service:
     enabled: true
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/user-service
-      tag: dev-latest
+      tag: develop-latest
       pullPolicy: IfNotPresent
     containerPort: 5865
     service:
@@ -134,13 +129,12 @@ services:
           remoteRef:
             key: /ecom/dev/user-service/cognito
             property: hosted_ui_signup_url
-
   product-service:
     enabled: true
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/product-service
-      tag: dev-latest
+      tag: develop-latest
       pullPolicy: IfNotPresent
     containerPort: 5861
     service:
@@ -205,13 +199,12 @@ services:
           remoteRef:
             key: /ecom/dev/product-service/db
             property: password
-
   shopping-cart-service:
     enabled: true
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/ecom-shop/shopping-cart-service
-      tag: dev-latest
+      tag: develop-latest
       pullPolicy: IfNotPresent
     containerPort: 5863
     service:
