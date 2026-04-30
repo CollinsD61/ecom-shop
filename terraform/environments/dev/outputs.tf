@@ -62,3 +62,14 @@ output "cluster_secret_store_name" {
   description = "ClusterSecretStore used by workloads"
   value       = module.external_secrets.cluster_secret_store_name
 }
+
+# CloudFront
+output "cloudfront_domain_name" {
+  description = "CloudFront domain — use as CNAME target for shop-dev in Cloudflare"
+  value       = var.acm_certificate_arn_us_east_1 != "" ? module.cloudfront_frontend[0].cloudfront_domain_name : "Not deployed (set acm_certificate_arn_us_east_1)"
+}
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID (for cache invalidation in CI/CD)"
+  value       = var.acm_certificate_arn_us_east_1 != "" ? module.cloudfront_frontend[0].cloudfront_distribution_id : ""
+}

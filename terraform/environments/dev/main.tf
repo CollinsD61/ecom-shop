@@ -148,12 +148,24 @@ variable "acm_certificate_arn" {
   default     = ""
 }
 
+variable "acm_certificate_arn_us_east_1" {
+  type        = string
+  description = "ACM wildcard cert ARN in us-east-1 for CloudFront (required by AWS)"
+  default     = ""
+}
+
 # ──────────────────────────────────────────────
 # Providers
 # ──────────────────────────────────────────────
 
 provider "aws" {
   region = var.aws_region
+}
+
+# CloudFront requires ACM certificates to be in us-east-1
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
 }
 
 provider "helm" {
@@ -373,4 +385,23 @@ module "irsa_shopping_cart_service" {
     module.secrets.service_db_secret_arns["shopping-cart-service"],
     module.secrets.shared_rds_secret_arn,
   ]
+}
+
+# ──────────────────────────────────────────────
+# Module: CloudFront (Frontend HTTPS)
+# ──────────────────────────────────────────────
+
+module "cloudfront_frontend" {
+  count  = var.acm_certificate_arn_us_east_1 != "" ? 1 : 0
+  source = "../../modules/cloudfront"
+
+  providers = {
+    aws = aws.us_east_1
+  }
+
+  env                 = var.env
+  aws_region          = var.aws_region
+  s3_bucket_name      = "shop-${var.env}.${var.domain_name}"
+  domain_name         = "shop-${var.env}.${var.domain_name}"
+  acm_certificate_arn = var.acm_certificate_arn_us_east_1
 }
