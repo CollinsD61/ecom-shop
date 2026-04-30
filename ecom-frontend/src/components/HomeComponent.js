@@ -60,26 +60,26 @@ export default function Home() {
   };
 
   const retrieveCart = async () => {
-      const user = localStorage.getItem("user");
-      if (!user) {
-          console.error("User not found in localStorage");
-          return; // Hoặc xử lý hợp lý hơn như chuyển hướng đến trang đăng nhập
-      }
+    const user = localStorage.getItem("user");
+    if (!user) {
+      console.error("User not found in localStorage");
+      return; // Hoặc xử lý hợp lý hơn như chuyển hướng đến trang đăng nhập
+    }
 
-      const parsedUser = JSON.parse(user);
+    const parsedUser = JSON.parse(user);
 
-      try {
-          const response = await cartService.getByName(parsedUser.username);
+    try {
+      const response = await cartService.getByName(parsedUser.username);
+      setCartId(response.data.id);
+    } catch (e) {
+      cartService.create(parsedUser.username)
+        .then((response) => {
           setCartId(response.data.id);
-      } catch (e) {
-          cartService.create(parsedUser.username)
-              .then((response) => {
-                  setCartId(response.data.id);
-              })
-              .catch((e) => {
-                  console.log(e);
-              });
-      }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   };
 
 
@@ -95,7 +95,7 @@ export default function Home() {
 
   const setActiveProduct = (product, index) => {
     setCurrentProduct(product);
-    };
+  };
 
   const formatCurrency = (amount) => {
     const number = Number(amount) || 0;
@@ -179,94 +179,98 @@ export default function Home() {
         SẢN PHẨM NỔI BẬT
       </Typography>
       <div className="row row-cols-1 row-cols-md-4 g-4">
-                    {featuredProducts &&
-                        featuredProducts.map((product, index) => (
-                            <div key={index} className="col">
-                                <Card className="product-card">
-                                    <Card.Img 
-                                        variant="top" 
-                                        src={assetUrl(productImageMap[product.name] || "placeholder.png")}
-                                        onClick={() => setActiveProduct(product, index)} 
-                                    />
-                                    <Card.Body>
-                                        <Card.Title style={{ textTransform: 'capitalize' }}>
-                                            {product.name}
-                                        </Card.Title>
-                                        <Card.Subtitle className="mb-2 text-muted">
-                                            {product.category}
-                                        </Card.Subtitle>
-                                        <Card.Text>
-                                            {product.description.length > 66 
-                                                ? product.description.substring(0, 66) + "..." 
-                                                : product.description}
-                                        </Card.Text>
-                                        <Card.Text style={{ color: '#0d3b3e', fontWeight: 600 }}>
-                                            {formatCurrency(product.price)} VNĐ
-                                        </Card.Text>
-                                        {currentProduct?.price}
-                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                            <Button
-                                                startIcon={<ShoppingCartRounded />}
-                                                variant="outlined"
-                                                color="success"
-                                                size="small"
-                                                onClick={() => addToCart(product)}
-                                                style={{ textTransform: "none" }}
-                                            >
-                                                Add to Cart
-                                            </Button>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </div>
-                        ))}
-                </div>
+        {featuredProducts &&
+          featuredProducts.map((product, index) => (
+            <div key={index} className="col">
+              <Card className="product-card">
+                <Card.Img
+                  variant="top"
+                  src={assetUrl(productImageMap[product.name] || "placeholder.png")}
+                  onClick={() => setActiveProduct(product, index)}
+                />
+                <Card.Body className="product-card-body">
+                  <Card.Title style={{ textTransform: 'capitalize' }}>
+                    {product.name}
+                  </Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    {product.category}
+                  </Card.Subtitle>
+                  <Card.Text className="product-card-desc">
+                    {product.description.length > 66
+                      ? product.description.substring(0, 66) + "..."
+                      : product.description}
+                  </Card.Text>
+                  <div className="product-card-bottom">
+                    <Card.Text style={{ color: 'var(--color-teal)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '16px' }}>
+                      {formatCurrency(product.price)} VNĐ
+                    </Card.Text>
+                    <Button
+                      startIcon={<ShoppingCartRounded />}
+                      variant="contained"
+                      style={{ 
+                        textTransform: "none", 
+                        width: "100%", 
+                        background: "linear-gradient(135deg, var(--color-teal), var(--color-teal-light))",
+                        borderRadius: "30px",
+                        padding: "8px 16px",
+                        boxShadow: "0 4px 14px rgba(147, 51, 234, 0.2)"
+                      }}
+                      onClick={() => addToCart(product)}
+                    >
+                      Add to Cart
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </div>
+          ))}
+      </div>
 
       {/* Footer */}
       <footer className="bg-light text-dark py-4">
-      <Container>
-        <Row>
-          {/* Bản quyền */}
-          <Col md={4} className="mb-3">
-            <h5>About Us</h5>
-            <p>
-              Ecom-Shop .
-            </p>
-          </Col>
+        <Container>
+          <Row>
+            {/* Bản quyền */}
+            <Col md={4} className="mb-3">
+              <h5>About Us</h5>
+              <p>
+                Ecom-Shop
+              </p>
+            </Col>
 
-          {/* Liên kết */}
-          <Col md={4} className="mb-3">
-            <h5>Quick Links</h5>
-            <ul className="list-unstyled">
-              <li>
-                <a href="https://devopsedu.vn/" className="text-dark text-decoration-none">Home</a>
-              </li>
-              <li>
-                <a href="/products" className="text-dark text-decoration-none">Products</a>
-              </li>
-              <li>
-                <a href="/profile" className="text-dark text-decoration-none">Profile</a>
-              </li>
-            </ul>
-          </Col>
+            {/* Liên kết */}
+            <Col md={4} className="mb-3">
+              <h5>Quick Links</h5>
+              <ul className="list-unstyled">
+                <li>
+                  <a href="https://www.facebook.com/groups/200998063799003" className="text-dark text-decoration-none">Home</a>
+                </li>
+                <li>
+                  <a href="/products" className="text-dark text-decoration-none">Products</a>
+                </li>
+                <li>
+                  <a href="/profile" className="text-dark text-decoration-none">Profile</a>
+                </li>
+              </ul>
+            </Col>
 
-          {/* Mạng xã hội */}
-          <Col md={4} className="mb-3">
-            <h5>Follow Us</h5>
-            <div className="d-flex gap-3">
-              <a href="https://www.facebook.com/do.hoang.uyh" target="_blank" rel="noopener noreferrer" className="text-dark">
-                <Facebook />
-              </a>
-              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-dark">
-                <YouTube />
-              </a>
-            </div>
-          </Col>
-        </Row>
-        <hr className="border-light" />
-        <p className="text-center mb-0">&copy; {new Date().getFullYear()} Ecom-Shop - devops.io.vn. All rights reserved.</p>
-      </Container>
-    </footer>
+            {/* Mạng xã hội */}
+            <Col md={4} className="mb-3">
+              <h5>Follow Us</h5>
+              <div className="d-flex gap-3">
+                <a href="https://www.facebook.com/do.hoang.uyh" target="_blank" rel="noopener noreferrer" className="text-dark">
+                  <Facebook />
+                </a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-dark">
+                  <YouTube />
+                </a>
+              </div>
+            </Col>
+          </Row>
+          <hr className="border-light" />
+          <p className="text-center mb-0">&copy; {new Date().getFullYear()} Ecom-Shop - devops.io.vn. All rights reserved.</p>
+        </Container>
+      </footer>
     </Container>
   );
 }

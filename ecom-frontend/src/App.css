@@ -8,10 +8,10 @@
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  --color-teal: #0d3b3e;
-  --color-teal-light: #155e63;
-  --color-gold: #c9a959;
-  --color-gold-light: #e0c67e;
+  --color-teal: #9333ea; /* Deep Purple */
+  --color-teal-light: #c026d3; /* Fuchsia/Pink-Purple */
+  --color-gold: #ec4899; /* Pink Accent */
+  --color-gold-light: #f472b6; /* Light Pink */
   --color-ivory: #faf8f4;
   --color-cream: #f3efe8;
   --color-charcoal: #1a1a1a;
@@ -319,6 +319,9 @@ label {
   overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition);
   background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -359,6 +362,21 @@ label {
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.5;
+  color: var(--color-charcoal);
+}
+
+.product-card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-card-desc {
+  flex-grow: 1;
+}
+
+.product-card-bottom {
+  margin-top: auto;
 }
 
 /* Price color override — use gold instead of red */
@@ -556,6 +574,9 @@ footer.bg-light .text-dark:hover {
   letter-spacing: 0.02em !important;
   position: relative;
   display: inline-block;
+  background: linear-gradient(90deg, var(--color-teal), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ============================================================
