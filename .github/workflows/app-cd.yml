@@ -200,6 +200,9 @@ jobs:
           ENV="${{ needs.prepare.outputs.environment }}"
           APP_NAME="ecom-shop-${ENV}"
 
+          # Set namespace cho context de argocd --core tim duoc argocd-cm
+          kubectl config set-context --current --namespace=argocd
+
           # Sync app using --core (direct Kubernetes API access, no port-forward needed)
           argocd app sync "${APP_NAME}" --core --force --prune
 
