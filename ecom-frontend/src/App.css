@@ -8,10 +8,10 @@
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  --color-teal: #0d3b3e;
-  --color-teal-light: #155e63;
-  --color-gold: #c9a959;
-  --color-gold-light: #e0c67e;
+  --color-teal: #9333ea; /* Deep Purple */
+  --color-teal-light: #c026d3; /* Fuchsia/Pink-Purple */
+  --color-gold: #ec4899; /* Pink Accent */
+  --color-gold-light: #f472b6; /* Light Pink */
   --color-ivory: #faf8f4;
   --color-cream: #f3efe8;
   --color-charcoal: #1a1a1a;
@@ -73,18 +73,34 @@ label {
   font-weight: 400;
 }
 
-.header-top a,
-.header-top button {
+.header-top-left {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-top-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.header-top-right a,
+.header-top-right button {
   color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  margin-left: 20px;
+  margin-left: 0;
   transition: color var(--transition);
   font-size: 11px;
   letter-spacing: 0.1em;
 }
 
-.header-top a:hover,
-.header-top button:hover {
+.header-top-right a:hover,
+.header-top-right button:hover {
   color: var(--color-gold-light);
 }
 
@@ -96,6 +112,11 @@ label {
 }
 
 .navbar-brand img {
+  display: block;
+  width: auto;
+  height: 40px;
+  max-width: 180px;
+  object-fit: contain;
   transition: transform var(--transition), opacity var(--transition);
 }
 
@@ -298,6 +319,9 @@ label {
   overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition);
   background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -308,6 +332,10 @@ label {
 }
 
 .product-card .card-img-top {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  object-position: center;
   transition: transform var(--transition);
 }
 
@@ -334,6 +362,21 @@ label {
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.5;
+  color: var(--color-charcoal);
+}
+
+.product-card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-card-desc {
+  flex-grow: 1;
+}
+
+.product-card-bottom {
+  margin-top: auto;
 }
 
 /* Price color override — use gold instead of red */
@@ -531,6 +574,9 @@ footer.bg-light .text-dark:hover {
   letter-spacing: 0.02em !important;
   position: relative;
   display: inline-block;
+  background: linear-gradient(90deg, var(--color-teal), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ============================================================
@@ -547,6 +593,25 @@ footer.bg-light .text-dark:hover {
   background-color: var(--color-teal);
 }
 
+.home-carousel {
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-carousel-image {
+  width: 100%;
+  height: clamp(300px, 38vw, 540px);
+  object-fit: cover;
+  object-position: center;
+}
+
+.category-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
 /* ============================================================
    RESPONSIVE — Mobile-first adjustments
    ============================================================ */
@@ -558,9 +623,19 @@ footer.bg-light .text-dark:hover {
     gap: 4px;
   }
 
-  .header-top a,
-  .header-top button {
-    margin-left: 8px;
+  .header-top-left {
+    flex-basis: 100%;
+  }
+
+  .header-top-right {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .header-top-right a,
+  .header-top-right button {
+    margin-left: 0;
     font-size: 10px;
   }
 
@@ -570,6 +645,10 @@ footer.bg-light .text-dark:hover {
 
   .search-form {
     width: 100%;
+  }
+
+  .home-carousel-image {
+    height: clamp(220px, 55vw, 320px);
   }
 
   .cardLogin {

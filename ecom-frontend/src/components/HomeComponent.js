@@ -10,6 +10,7 @@ import { Card } from "react-bootstrap";
 import 'react-toastify/dist/ReactToastify.css';
 import { Row, Col } from "react-bootstrap";
 import { Facebook } from "@mui/icons-material";
+import { assetUrl } from "../helpers/assetUrl";
 
 const categories = [
   { name: "Thời Trang Nam", image: "/thoi-trang-nam.png" },
@@ -59,26 +60,26 @@ export default function Home() {
   };
 
   const retrieveCart = async () => {
-      const user = localStorage.getItem("user");
-      if (!user) {
-          console.error("User not found in localStorage");
-          return; // Hoặc xử lý hợp lý hơn như chuyển hướng đến trang đăng nhập
-      }
+    const user = localStorage.getItem("user");
+    if (!user) {
+      console.error("User not found in localStorage");
+      return; // Hoặc xử lý hợp lý hơn như chuyển hướng đến trang đăng nhập
+    }
 
-      const parsedUser = JSON.parse(user);
+    const parsedUser = JSON.parse(user);
 
-      try {
-          const response = await cartService.getByName(parsedUser.username);
+    try {
+      const response = await cartService.getByName(parsedUser.username);
+      setCartId(response.data.id);
+    } catch (e) {
+      cartService.create(parsedUser.username)
+        .then((response) => {
           setCartId(response.data.id);
-      } catch (e) {
-          cartService.create(parsedUser.username)
-              .then((response) => {
-                  setCartId(response.data.id);
-              })
-              .catch((e) => {
-                  console.log(e);
-              });
-      }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   };
 
 
@@ -94,7 +95,7 @@ export default function Home() {
 
   const setActiveProduct = (product, index) => {
     setCurrentProduct(product);
-    };
+  };
 
   const formatCurrency = (amount) => {
     const number = Number(amount) || 0;
@@ -117,22 +118,22 @@ export default function Home() {
   return (
     <Container>
       {/* Banner */}
-      <Box className="text-center my-4">
+      <Box className="text-center my-4 home-carousel">
         <Carousel>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-4.png" alt="Slide 4" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-4.png")} alt="Slide 4" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-0.png" alt="Slide 0" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-0.png")} alt="Slide 0" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-1.png" alt="Slide 1" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-1.png")} alt="Slide 1" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-2.png" alt="Slide 2" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-2.png")} alt="Slide 2" />
           </Carousel.Item>
           <Carousel.Item>
-            <img className="d-block w-100 img-fluid" src="slide-3.png" alt="Slide 3" />
+            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-3.png")} alt="Slide 3" />
           </Carousel.Item>
         </Carousel>
       </Box>
@@ -160,9 +161,9 @@ export default function Home() {
           {displayedCategories.map((category, index) => (
             <Grid item xs={6} sm={4} md={2} key={index} className="text-center">
               <img
-                src={category.image}
+                src={assetUrl(category.image)}
                 alt={category.name}
-                className="rounded-circle mb-2 img-fluid"
+                className="rounded-circle mb-2 img-fluid category-image"
               />
               <Typography>{category.name}</Typography>
             </Grid>
@@ -178,94 +179,98 @@ export default function Home() {
         SẢN PHẨM NỔI BẬT
       </Typography>
       <div className="row row-cols-1 row-cols-md-4 g-4">
-                    {featuredProducts &&
-                        featuredProducts.map((product, index) => (
-                            <div key={index} className="col">
-                                <Card className="product-card">
-                                    <Card.Img 
-                                        variant="top" 
-                                        src={`/${productImageMap[product.name] || "placeholder.png"}`}
-                                        onClick={() => setActiveProduct(product, index)} 
-                                    />
-                                    <Card.Body>
-                                        <Card.Title style={{ textTransform: 'capitalize' }}>
-                                            {product.name}
-                                        </Card.Title>
-                                        <Card.Subtitle className="mb-2 text-muted">
-                                            {product.category}
-                                        </Card.Subtitle>
-                                        <Card.Text>
-                                            {product.description.length > 66 
-                                                ? product.description.substring(0, 66) + "..." 
-                                                : product.description}
-                                        </Card.Text>
-                                        <Card.Text style={{ color: '#0d3b3e', fontWeight: 600 }}>
-                                            {formatCurrency(product.price)} VNĐ
-                                        </Card.Text>
-                                        {currentProduct?.price}
-                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                            <Button
-                                                startIcon={<ShoppingCartRounded />}
-                                                variant="outlined"
-                                                color="success"
-                                                size="small"
-                                                onClick={() => addToCart(product)}
-                                                style={{ textTransform: "none" }}
-                                            >
-                                                Add to Cart
-                                            </Button>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </div>
-                        ))}
-                </div>
+        {featuredProducts &&
+          featuredProducts.map((product, index) => (
+            <div key={index} className="col">
+              <Card className="product-card">
+                <Card.Img
+                  variant="top"
+                  src={assetUrl(productImageMap[product.name] || "placeholder.png")}
+                  onClick={() => setActiveProduct(product, index)}
+                />
+                <Card.Body className="product-card-body">
+                  <Card.Title style={{ textTransform: 'capitalize' }}>
+                    {product.name}
+                  </Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    {product.category}
+                  </Card.Subtitle>
+                  <Card.Text className="product-card-desc">
+                    {product.description.length > 66
+                      ? product.description.substring(0, 66) + "..."
+                      : product.description}
+                  </Card.Text>
+                  <div className="product-card-bottom">
+                    <Card.Text style={{ color: 'var(--color-teal)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '16px' }}>
+                      {formatCurrency(product.price)} VNĐ
+                    </Card.Text>
+                    <Button
+                      startIcon={<ShoppingCartRounded />}
+                      variant="contained"
+                      style={{ 
+                        textTransform: "none", 
+                        width: "100%", 
+                        background: "linear-gradient(135deg, var(--color-teal), var(--color-teal-light))",
+                        borderRadius: "30px",
+                        padding: "8px 16px",
+                        boxShadow: "0 4px 14px rgba(147, 51, 234, 0.2)"
+                      }}
+                      onClick={() => addToCart(product)}
+                    >
+                      Add to Cart
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </div>
+          ))}
+      </div>
 
       {/* Footer */}
       <footer className="bg-light text-dark py-4">
-      <Container>
-        <Row>
-          {/* Bản quyền */}
-          <Col md={4} className="mb-3">
-            <h5>About Us</h5>
-            <p>
-              Shop now - Microservice.
-            </p>
-          </Col>
+        <Container>
+          <Row>
+            {/* Bản quyền */}
+            <Col md={4} className="mb-3">
+              <h5>About Us</h5>
+              <p>
+                Ecom-Shop
+              </p>
+            </Col>
 
-          {/* Liên kết */}
-          <Col md={4} className="mb-3">
-            <h5>Quick Links</h5>
-            <ul className="list-unstyled">
-              <li>
-                <a href="https://devopsedu.vn/" className="text-dark text-decoration-none">Home</a>
-              </li>
-              <li>
-                <a href="/products" className="text-dark text-decoration-none">Products</a>
-              </li>
-              <li>
-                <a href="/profile" className="text-dark text-decoration-none">Profile</a>
-              </li>
-            </ul>
-          </Col>
+            {/* Liên kết */}
+            <Col md={4} className="mb-3">
+              <h5>Quick Links</h5>
+              <ul className="list-unstyled">
+                <li>
+                  <a href="https://www.facebook.com/groups/200998063799003" className="text-dark text-decoration-none">Home</a>
+                </li>
+                <li>
+                  <a href="/products" className="text-dark text-decoration-none">Products</a>
+                </li>
+                <li>
+                  <a href="/profile" className="text-dark text-decoration-none">Profile</a>
+                </li>
+              </ul>
+            </Col>
 
-          {/* Mạng xã hội */}
-          <Col md={4} className="mb-3">
-            <h5>Follow Us</h5>
-            <div className="d-flex gap-3">
-              <a href="https://www.facebook.com/groups/devopsedu.vn" target="_blank" rel="noopener noreferrer" className="text-dark">
-                <Facebook />
-              </a>
-              <a href="https://www.youtube.com/@devopseduvn" target="_blank" rel="noopener noreferrer" className="text-dark">
-                <YouTube />
-              </a>
-            </div>
-          </Col>
-        </Row>
-        <hr className="border-light" />
-        <p className="text-center mb-0">&copy; {new Date().getFullYear()} Shop now - Microservice - devopsedu.vn. All rights reserved.</p>
-      </Container>
-    </footer>
+            {/* Mạng xã hội */}
+            <Col md={4} className="mb-3">
+              <h5>Follow Us</h5>
+              <div className="d-flex gap-3">
+                <a href="https://www.facebook.com/do.hoang.uyh" target="_blank" rel="noopener noreferrer" className="text-dark">
+                  <Facebook />
+                </a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-dark">
+                  <YouTube />
+                </a>
+              </div>
+            </Col>
+          </Row>
+          <hr className="border-light" />
+          <p className="text-center mb-0">&copy; {new Date().getFullYear()} Ecom-Shop - devops.io.vn. All rights reserved.</p>
+        </Container>
+      </footer>
     </Container>
   );
 }
