@@ -1,14 +1,16 @@
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  --color-purple-shopee: #9370DB; /* Medium Slate Blue */
-  --color-purple-hover: #8A2BE2;
-  --color-ivory: #FDFBFF; /* Very light purple background */
+  --color-pink-shopee: #ee4d2d; /* Primary Shopee Orange-Pink */
+  --color-pink-gradient: linear-gradient(135deg, #ff6633, #ee4d2d);
+  --color-pink-hover: #d73211;
+  --color-ivory: #FDFBFF; /* Very light background */
   --color-teal: #20B2AA;
   --color-teal-light: #48D1CC;
   --color-muted: #6c757d;
   --font-body: 'Be Vietnam Pro', 'Inter', sans-serif;
   --transition: 0.3s ease;
   --shadow-soft: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-premium: 0 10px 30px rgba(238, 77, 45, 0.15);
 }
 
 /* ---------- Global Reset ---------- */
@@ -19,15 +21,15 @@ body {
   color: #333;
 }
 
-/* ---------- Unified Purple Header ---------- */
+/* ---------- Unified Gradient Header ---------- */
 .header-container {
-  background-color: var(--color-purple-shopee);
+  background: var(--color-pink-gradient);
   color: #FFFFFF !important;
   padding: 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .header-top {
@@ -124,7 +126,7 @@ body {
 }
 
 .search-button {
-  background-color: var(--color-purple-shopee) !important;
+  background: var(--color-pink-gradient) !important;
   color: #FFFFFF !important;
   border: none !important;
   padding: 0 20px !important;
@@ -142,6 +144,25 @@ body {
   text-decoration: none;
   font-size: 12px;
   opacity: 0.9;
+}
+
+/* ---------- Home Carousel ---------- */
+.home-carousel {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.home-carousel-image {
+  height: 400px;
+  object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .home-carousel-image {
+    height: 250px;
+  }
 }
 
 /* ---------- Product Cards ---------- */
@@ -236,7 +257,7 @@ body {
   width: 80px;
   height: 80px;
   object-fit: cover;
-  border: 2px solid var(--color-purple-shopee);
+  border: 2px solid var(--color-pink-shopee);
   padding: 3px;
   transition: transform var(--transition);
 }
@@ -247,29 +268,32 @@ body {
 
 /* ---------- Footer Redesign ---------- */
 footer.bg-light {
-  background-color: var(--color-purple-shopee) !important;
+  background: var(--color-pink-gradient) !important;
   color: #FFFFFF !important;
-  padding: 50px 0 30px !important;
+  padding: 60px 0 30px !important;
   margin: 0;
   border: none;
-  box-shadow: none;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
 }
 
 footer.bg-light h5 {
   color: #FFFFFF !important;
   font-weight: 700;
-  margin-bottom: 20px;
-  font-size: 15px;
+  margin-bottom: 25px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
 }
 
 footer.bg-light a, footer.bg-light p {
-  color: rgba(255,255,255,0.8) !important;
+  color: rgba(255,255,255,0.9) !important;
   text-decoration: none !important;
   font-size: 14px;
+  transition: color var(--transition);
 }
 
 footer.bg-light a:hover {
   color: #FFFFFF !important;
+  padding-left: 5px;
 }
 
 .payment-icons {
