@@ -24,7 +24,6 @@ import EventBus from "./common/EventBus";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProfileEditComponent from "./components/ProfileEditComponent";
-import { assetUrl } from "./helpers/assetUrl";
 
 class App extends Component {
   constructor(props) {

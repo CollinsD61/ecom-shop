@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Box, Typography, IconButton, Grid, Button } from "@mui/material";
-import { ShoppingCartRounded, YouTube } from "@mui/icons-material";
+import { ShoppingCartRounded } from "@mui/icons-material";
 import { Carousel } from "react-bootstrap";
 import productService from "../services/ProductService";
 import cartService from "../services/CartService";
 import { toast } from 'react-toastify';
 import { Card } from "react-bootstrap";
 import 'react-toastify/dist/ReactToastify.css';
-import { Row, Col } from "react-bootstrap";
-import { Facebook } from "@mui/icons-material";
 import { assetUrl } from "../helpers/assetUrl";
 
 const categories = [
