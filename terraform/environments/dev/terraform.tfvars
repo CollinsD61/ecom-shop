@@ -33,7 +33,5 @@ db_skip_final_snapshot     = true
 domain_name = "dohoangdevops.io.vn"
 
 # ACM wildcard certificate ARN for HTTPS on ALB
-# Create via: AWS Console → Certificate Manager → Request → *.dohoangdevops.io.vn
-# Then add the CNAME validation record to Cloudflare, wait for "Issued" status
-# argocd_acm_certificate_arn = "arn:aws:acm:ap-southeast-1:879381260173:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-# acm_certificate_arn        = "arn:aws:acm:ap-southeast-1:879381260173:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+argocd_acm_certificate_arn = "arn:aws:acm:ap-southeast-1:879381260173:certificate/44c4d925-3527-429b-9620-5551a992991a"
+acm_certificate_arn        = "arn:aws:acm:ap-southeast-1:879381260173:certificate/44c4d925-3527-429b-9620-5551a992991a"
