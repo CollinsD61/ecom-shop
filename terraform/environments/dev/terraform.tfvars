@@ -35,3 +35,6 @@ domain_name = "dohoangdevops.io.vn"
 # ACM wildcard certificate ARN for HTTPS on ALB
 argocd_acm_certificate_arn = "arn:aws:acm:ap-southeast-1:879381260173:certificate/44c4d925-3527-429b-9620-5551a992991a"
 acm_certificate_arn        = "arn:aws:acm:ap-southeast-1:879381260173:certificate/44c4d925-3527-429b-9620-5551a992991a"
+
+# ACM cert in us-east-1 for CloudFront (required by AWS)
+acm_certificate_arn_us_east_1 = "arn:aws:acm:us-east-1:879381260173:certificate/c1de11b3-0e69-4b2a-bd2f-1711cdbf6d94"

@@ -392,7 +392,6 @@ module "irsa_shopping_cart_service" {
 # ──────────────────────────────────────────────
 
 module "cloudfront_frontend" {
-  count  = var.acm_certificate_arn_us_east_1 != "" ? 1 : 0
   source = "../../modules/cloudfront"
 
   providers = {
