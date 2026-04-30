@@ -115,20 +115,25 @@ export default function Home() {
       {/* Banner */}
       <Box className="text-center my-4 home-carousel">
         <Carousel fade interval={5000} pause="hover">
-          <Carousel.Item>
-            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-4.png")} alt="Slide 4" />
+          <Carousel.Item className="home-carousel-item">
+            <div className="home-carousel-bg" style={{ backgroundImage: `url(${assetUrl("slide-4.png")})` }}></div>
+            <img className="home-carousel-image" src={assetUrl("slide-4.png")} alt="Slide 4" />
           </Carousel.Item>
-          <Carousel.Item>
-            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-0.png")} alt="Slide 0" />
+          <Carousel.Item className="home-carousel-item">
+            <div className="home-carousel-bg" style={{ backgroundImage: `url(${assetUrl("slide-0.png")})` }}></div>
+            <img className="home-carousel-image" src={assetUrl("slide-0.png")} alt="Slide 0" />
           </Carousel.Item>
-          <Carousel.Item>
-            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-1.png")} alt="Slide 1" />
+          <Carousel.Item className="home-carousel-item">
+            <div className="home-carousel-bg" style={{ backgroundImage: `url(${assetUrl("slide-1.png")})` }}></div>
+            <img className="home-carousel-image" src={assetUrl("slide-1.png")} alt="Slide 1" />
           </Carousel.Item>
-          <Carousel.Item>
-            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-2.png")} alt="Slide 2" />
+          <Carousel.Item className="home-carousel-item">
+            <div className="home-carousel-bg" style={{ backgroundImage: `url(${assetUrl("slide-2.png")})` }}></div>
+            <img className="home-carousel-image" src={assetUrl("slide-2.png")} alt="Slide 2" />
           </Carousel.Item>
-          <Carousel.Item>
-            <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-3.png")} alt="Slide 3" />
+          <Carousel.Item className="home-carousel-item">
+            <div className="home-carousel-bg" style={{ backgroundImage: `url(${assetUrl("slide-3.png")})` }}></div>
+            <img className="home-carousel-image" src={assetUrl("slide-3.png")} alt="Slide 3" />
           </Carousel.Item>
         </Carousel>
       </Box>
