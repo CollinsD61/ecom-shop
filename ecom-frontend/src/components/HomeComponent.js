@@ -114,7 +114,7 @@ export default function Home() {
     <Container>
       {/* Banner */}
       <Box className="text-center my-4 home-carousel">
-        <Carousel>
+        <Carousel fade interval={5000} pause="hover">
           <Carousel.Item>
             <img className="d-block w-100 img-fluid home-carousel-image" src={assetUrl("slide-4.png")} alt="Slide 4" />
           </Carousel.Item>
