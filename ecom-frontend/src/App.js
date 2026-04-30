@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import { Container, Navbar, Form, FormControl, Button } from "react-bootstrap";
-import { Search, ShoppingCart, Notifications, Help, Language } from "@mui/icons-material";
+import { Container, Navbar, Form, FormControl, Button, Row, Col } from "react-bootstrap";
+import { Search, ShoppingCart, Notifications, Help, Language, Facebook, YouTube, Email, Phone, Send, AccountCircle } from "@mui/icons-material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -72,20 +72,22 @@ class App extends Component {
     return (
       <>
         {/* Font import */}
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&display=swap" rel="stylesheet" />
         <div className="header-container">
-        {/* Header Top */}
+        {/* Header Top - Tầng 1 (Tím đậm) */}
         <div className="header-top">
           <div className="header-top-left">
-            Ưu đãi hôm nay: Miễn phí ship đơn từ 299K
+            ƯU ĐÃI HÔM NAY: Miễn phí vận chuyển cho đơn hàng từ 299K!
           </div>
           <div className="header-top-right">
-            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Notifications /></button>
-            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Help /></button>
-            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language /> Tiếng Việt</button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} title="Thông báo"><Notifications fontSize="small" /></button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} title="Hỗ trợ"><Help fontSize="small" /></button>
+            <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}}><Language fontSize="small" /> Tiếng Việt</button>
             {currentUser ? (
               <>
-                <Link to="/profile" className="auth-links">{currentUser.username}</Link>
+                <Link to="/profile" className="auth-links" style={{display:'flex', alignItems:'center', gap:'4px'}}>
+                  <AccountCircle fontSize="small" /> {currentUser.username}
+                </Link>
                 <button style={{background:'none', border:'none', color:'inherit', cursor:'pointer'}} className="auth-links" onClick={this.logOut}>Đăng Xuất</button>
               </>
             ) : (
@@ -97,24 +99,28 @@ class App extends Component {
           </div>
         </div>
 
-        {/* Navbar */}
-        <Navbar expand="lg" className="navbar" variant="light">
-          <Container fluid>
-            {/* Logo */}
-            <Navbar.Brand as={Link} to="/">
-              <img
-                src={assetUrl("/Shop now-logo.png")}
-                alt="Logo"
-                width="120"
-                height="40"
-              />
+        {/* Navbar - Tầng 2 (Trắng ánh tím) */}
+        <Navbar expand="lg" className="navbar">
+          <Container fluid style={{padding: '0 60px'}}>
+            {/* Logo logotype 'Ecom-Shop' */}
+            <Navbar.Brand as={Link} to="/" style={{display: 'flex', alignItems: 'center', textDecoration: 'none'}}>
+              <div style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '28px',
+                color: 'var(--color-teal)',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <span style={{color: 'var(--color-gold)', marginRight: '2px'}}>E</span>com-Shop
+              </div>
             </Navbar.Brand>
 
-            {/* Thanh tìm kiếm */}
+            {/* Thanh tìm kiếm - Trung tâm & Thu gọn */}
             <Form className="search-form">
               <FormControl
                 type="search"
-                placeholder="Shop now bao ship 0đ - Đăng ký ngay!"
+                placeholder="Tìm kiếm sản phẩm..."
                 aria-label="Search"
               />
               <Button className="search-button">
@@ -122,18 +128,32 @@ class App extends Component {
               </Button>
             </Form>
 
-            {/* Biểu tượng giỏ hàng */}
+            {/* Biểu tượng giỏ hàng & Tài khoản */}
             <div className="nav-icons">
-              <a href="/cart">
+              <Link to="/cart" title="Giỏ hàng">
                   <ShoppingCart />
-              </a>
+              </Link>
+              {currentUser && (
+                <Link to="/profile" title="Tài khoản">
+                  <AccountCircle />
+                </Link>
+              )}
             </div>
           </Container>
         </Navbar>
+
+        {/* Menu điều hướng ngang */}
+        <div className="nav-menu">
+          <Link to="/" className="nav-menu-item">Thời Trang</Link>
+          <Link to="/" className="nav-menu-item">Điện Tử</Link>
+          <Link to="/" className="nav-menu-item">Làm Đẹp</Link>
+          <Link to="/" className="nav-menu-item">Đồ Gia Dụng</Link>
+          <Link to="/" className="nav-menu-item" style={{color: 'var(--color-gold)'}}>Khuyến Mãi</Link>
+        </div>
         </div>
 
         {/* Nội dung trang */}
-        <div className="container mt-3">
+        <div className="container mt-4 mb-5" style={{minHeight: '60vh'}}>
           <Routes>
             <Route path="/" element={<HomeComponent />} />
             <Route path="/login" element={<LoginComponent />} />
@@ -150,6 +170,83 @@ class App extends Component {
             )}
           </Routes>
         </div>
+
+        {/* Footer Redesign */}
+        <footer className="bg-light py-5">
+          <Container>
+            <Row className="g-4">
+              {/* Cột 1: About Us */}
+              <Col lg={3} md={6}>
+                <h5 style={{color: '#F3E5F5'}}>About Us</h5>
+                <p style={{fontSize: '14px', lineHeight: '1.6', marginBottom: '20px', color: 'rgba(255, 255, 255, 0.7)'}}>
+                  Ecom-Shop là nền tảng thương mại điện tử hiện đại, mang đến trải nghiệm mua sắm sang trọng và tiện lợi.
+                </p>
+                <div style={{fontSize: '14px', display:'flex', flexDirection:'column', gap:'10px', color: 'rgba(255, 255, 255, 0.7)'}}>
+                  <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+                    <Email fontSize="small" style={{color:'var(--color-lavender-light)'}} /> 
+                    <span>support@ecom-shop.devops.io.vn</span>
+                  </div>
+                  <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+                    <Phone fontSize="small" style={{color:'var(--color-lavender-light)'}} /> 
+                    <span>+84 123 456 789</span>
+                  </div>
+                </div>
+              </Col>
+
+              {/* Cột 2: Quick Links */}
+              <Col lg={3} md={6}>
+                <h5 style={{color: '#F3E5F5'}}>Quick Links</h5>
+                <ul className="list-unstyled" style={{fontSize: '14px', display:'flex', flexDirection:'column', gap:'12px'}}>
+                  <li><Link to="/" style={{color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none'}}>Trang Chủ</Link></li>
+                  <li><Link to="/products" style={{color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none'}}>Sản Phẩm</Link></li>
+                  <li><Link to="/profile" style={{color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none'}}>Tài Khoản</Link></li>
+                  <li><Link to="/cart" style={{color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none'}}>Giỏ Hàng</Link></li>
+                </ul>
+              </Col>
+
+              {/* Cột 3: Bản tin */}
+              <Col lg={3} md={6}>
+                <h5 style={{color: '#F3E5F5'}}>Bản tin</h5>
+                <p style={{fontSize: '14px', marginBottom: '15px', color: 'rgba(255, 255, 255, 0.7)'}}>Đăng ký để nhận thông tin khuyến mãi mới nhất từ chúng tôi.</p>
+                <Form className="d-flex" style={{gap: '5px'}}>
+                  <FormControl
+                    type="email"
+                    placeholder="Email của bạn"
+                    style={{fontSize: '13px', borderRadius: '4px', border: 'none'}}
+                  />
+                  <Button style={{
+                    background: 'var(--color-gold)', 
+                    border: 'none', 
+                    borderRadius: '4px',
+                    padding: '0 15px'
+                  }}>
+                    <Send fontSize="small" />
+                  </Button>
+                </Form>
+              </Col>
+
+              {/* Cột 4: Follow Us & Payment */}
+              <Col lg={3} md={6}>
+                <h5 style={{color: '#F3E5F5'}}>Follow Us & Payment</h5>
+                <div className="d-flex gap-3 mb-4">
+                  <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{color: 'rgba(255, 255, 255, 0.7)'}}><Facebook /></a>
+                  <a href="https://youtube.com" target="_blank" rel="noreferrer" style={{color: 'rgba(255, 255, 255, 0.7)'}}><YouTube /></a>
+                </div>
+                <div className="d-flex flex-wrap gap-2 mt-3">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" height="20" style={{filter: 'brightness(0) invert(1)', opacity: 0.8}} />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" height="20" style={{opacity: 0.8}} />
+                  <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" height="20" style={{borderRadius: '4px'}} />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" height="20" style={{filter: 'brightness(0) invert(1)', opacity: 0.8}} />
+                </div>
+              </Col>
+            </Row>
+            <hr style={{margin: '40px 0 20px', borderColor: 'rgba(255,255,255,0.1)'}} />
+            <p className="text-center mb-0" style={{fontSize: '13px', opacity: 0.7, color: 'rgba(255, 255, 255, 0.7)'}}>
+              &copy; {new Date().getFullYear()} Ecom-Shop - devops.io.vn. All rights reserved.
+            </p>
+          </Container>
+        </footer>
+
         <ToastContainer />
         <AuthVerify logOut={this.logOut} />
       </>

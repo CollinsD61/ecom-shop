@@ -256,30 +256,36 @@ const ProductsList = () => {
                                         src={assetUrl(productImageMap[product.name] || "placeholder.png")}
                                         onClick={() => setActiveProduct(product, index)} 
                                     />
-                                    <Card.Body>
-                                        <Card.Title style={{ textTransform: 'capitalize' }}>
+                                    <Card.Body className="product-card-body">
+                                        <Card.Title style={{ textTransform: 'capitalize', fontWeight: 700, fontSize: '1.1rem' }}>
                                             {product.name}
                                         </Card.Title>
-                                        <Card.Subtitle className="mb-2 text-muted">
+                                        <Card.Subtitle className="mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
                                             {product.category}
                                         </Card.Subtitle>
-                                        <Card.Text>
-                                            {product.description.length > 66 
-                                                ? product.description.substring(0, 66) + "..." 
+                                        <Card.Text className="product-card-desc" style={{ fontSize: '0.9rem', color: 'var(--color-muted)' }}>
+                                            {product.description.length > 60 
+                                                ? product.description.substring(0, 60) + "..." 
                                                 : product.description}
                                         </Card.Text>
-                                        <Card.Text style={{ color: '#0d3b3e', fontWeight: 600 }}>
-                                            {formatCurrency(product.price)} VNĐ
-                                        </Card.Text>
-                                        {currentProduct?.price}
-                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <div className="product-card-bottom">
+                                            <Card.Text style={{ color: 'var(--color-teal)', fontWeight: 700, fontSize: '1.2rem', marginBottom: '16px' }}>
+                                                {formatCurrency(product.price)} VNĐ
+                                            </Card.Text>
                                             <Button
                                                 startIcon={<ShoppingCartRounded />}
-                                                variant="outlined"
-                                                color="success"
-                                                size="small"
+                                                variant="contained"
+                                                size="medium"
                                                 onClick={() => addToCart(product)}
-                                                style={{ textTransform: "none" }}
+                                                style={{ 
+                                                    textTransform: "none",
+                                                    width: "100%",
+                                                    background: "linear-gradient(135deg, var(--color-teal), var(--color-teal-light))",
+                                                    borderRadius: "12px",
+                                                    padding: "8px 16px",
+                                                    fontWeight: 600,
+                                                    boxShadow: "var(--shadow-soft)"
+                                                }}
                                             >
                                                 Add to Cart
                                             </Button>

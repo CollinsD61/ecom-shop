@@ -17,7 +17,7 @@ const categories = [
   { name: "Điện Thoại & Phụ Kiện", image: "/dien-thoai-phu-kien.png" },
   { name: "Thiết Bị Điện Tử", image: "/thiet-bi-dien-tu.png" },
   { name: "Máy Tính & Laptop", image: "/may-tinh-lap-top.png" },
-  { name: "Nhà Cửa & Đời Sống", image: "/nha-cua-doi-song.png" },
+  { name: "Đồ Gia Dụng", image: "/nha-cua-doi-song.png" },
   { name: "Sắc Đẹp", image: "/sac-dep.png" },
   { name: "Đồng Hồ", image: "/dong-ho.png" },
   { name: "Giày Dép Nam", image: "/giay-dep-nam.png" },
@@ -185,19 +185,19 @@ export default function Home() {
                   src={assetUrl(productImageMap[product.name] || "placeholder.png")}
                 />
                 <Card.Body className="product-card-body">
-                  <Card.Title style={{ textTransform: 'capitalize' }}>
+                  <Card.Title style={{ textTransform: 'capitalize', fontWeight: 700, fontSize: '1.1rem' }}>
                     {product.name}
                   </Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
+                  <Card.Subtitle className="mb-2 text-muted" style={{ fontSize: '0.85rem' }}>
                     {product.category}
                   </Card.Subtitle>
-                  <Card.Text className="product-card-desc">
-                    {product.description.length > 66
-                      ? product.description.substring(0, 66) + "..."
+                  <Card.Text className="product-card-desc" style={{ fontSize: '0.9rem', color: 'var(--color-muted)' }}>
+                    {product.description.length > 60
+                      ? product.description.substring(0, 60) + "..."
                       : product.description}
                   </Card.Text>
                   <div className="product-card-bottom">
-                    <Card.Text style={{ color: 'var(--color-teal)', fontWeight: 600, fontSize: '1.1rem', marginBottom: '16px' }}>
+                    <Card.Text style={{ color: 'var(--color-teal)', fontWeight: 700, fontSize: '1.2rem', marginBottom: '16px' }}>
                       {formatCurrency(product.price)} VNĐ
                     </Card.Text>
                     <Button
@@ -207,9 +207,10 @@ export default function Home() {
                         textTransform: "none", 
                         width: "100%", 
                         background: "linear-gradient(135deg, var(--color-teal), var(--color-teal-light))",
-                        borderRadius: "30px",
-                        padding: "8px 16px",
-                        boxShadow: "0 4px 14px rgba(147, 51, 234, 0.2)"
+                        borderRadius: "12px",
+                        padding: "10px 16px",
+                        fontWeight: 600,
+                        boxShadow: "var(--shadow-soft)"
                       }}
                       onClick={() => addToCart(product)}
                     >
@@ -221,52 +222,6 @@ export default function Home() {
             </div>
           ))}
       </div>
-
-      {/* Footer */}
-      <footer className="bg-light text-dark py-4">
-        <Container>
-          <Row>
-            {/* Bản quyền */}
-            <Col md={4} className="mb-3">
-              <h5>About Us</h5>
-              <p>
-                Ecom-Shop
-              </p>
-            </Col>
-
-            {/* Liên kết */}
-            <Col md={4} className="mb-3">
-              <h5>Quick Links</h5>
-              <ul className="list-unstyled">
-                <li>
-                  <a href="https://www.facebook.com/groups/200998063799003" className="text-dark text-decoration-none">Home</a>
-                </li>
-                <li>
-                  <a href="/products" className="text-dark text-decoration-none">Products</a>
-                </li>
-                <li>
-                  <a href="/profile" className="text-dark text-decoration-none">Profile</a>
-                </li>
-              </ul>
-            </Col>
-
-            {/* Mạng xã hội */}
-            <Col md={4} className="mb-3">
-              <h5>Follow Us</h5>
-              <div className="d-flex gap-3">
-                <a href="https://www.facebook.com/do.hoang.uyh" target="_blank" rel="noopener noreferrer" className="text-dark">
-                  <Facebook />
-                </a>
-                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-dark">
-                  <YouTube />
-                </a>
-              </div>
-            </Col>
-          </Row>
-          <hr className="border-light" />
-          <p className="text-center mb-0">&copy; {new Date().getFullYear()} Ecom-Shop - devops.io.vn. All rights reserved.</p>
-        </Container>
-      </footer>
     </Container>
   );
 }
