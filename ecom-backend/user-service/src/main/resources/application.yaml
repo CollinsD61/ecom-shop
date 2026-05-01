@@ -22,9 +22,6 @@ spring:
     properties:
       hibernate:
         format-sql: true
-  cloud:
-    config:
-      enabled: false
 
 eureka:
   client:
