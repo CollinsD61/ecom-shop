@@ -1,15 +1,16 @@
 /* ---------- CSS Custom Properties ---------- */
 :root {
-  --color-pink-purple: #ff0080; 
+  --color-pink-purple: #ff0080;
   --color-pink-purple-gradient: linear-gradient(135deg, #ff0080 0%, #7928ca 100%);
   --color-pink-purple-hover: #e60073;
-  --color-ivory: #FDFBFF; /* Very light background */
+  --color-ivory: #FDFBFF;
+  /* Very light background */
   --color-teal: #20B2AA;
   --color-teal-light: #48D1CC;
   --color-muted: #6c757d;
   --font-body: 'Be Vietnam Pro', 'Inter', sans-serif;
   --transition: 0.3s ease;
-  --shadow-soft: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-premium: 0 10px 30px rgba(255, 0, 128, 0.15);
 }
 
@@ -47,7 +48,8 @@ body {
   gap: 20px;
 }
 
-.header-top a, .header-top button {
+.header-top a,
+.header-top button {
   color: #FFFFFF !important;
   text-decoration: none;
   font-weight: 400;
@@ -62,7 +64,8 @@ body {
   transition: opacity var(--transition);
 }
 
-.header-top a:hover, .header-top button:hover {
+.header-top a:hover,
+.header-top button:hover {
   opacity: 0.8;
 }
 
@@ -150,51 +153,41 @@ body {
 .home-carousel {
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   margin-top: 2rem !important;
   margin-bottom: 3rem !important;
-  background-color: #000;
 }
 
 .home-carousel-item {
-  height: 500px;
   position: relative;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  background-color: #000;
+  height: 500px;
+  overflow: hidden;
 }
 
+/* Background layer not needed */
 .home-carousel-bg {
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  right: -10%;
-  bottom: -10%;
-  background-size: cover;
-  background-position: center;
-  filter: blur(30px) brightness(0.6);
-  z-index: 0;
-  opacity: 0.8;
+  display: none;
 }
 
+/* Fixed height, full width, center-focused crop */
 .home-carousel-image {
+  width: 100% !important;
   height: 500px;
-  width: auto !important;
-  max-width: 100%;
-  object-fit: contain;
-  position: relative;
-  z-index: 1;
+  object-fit: cover;
+  object-position: center;
+  display: block;
   transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .home-carousel:hover .home-carousel-image {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
 @media (max-width: 768px) {
-  .home-carousel-item, .home-carousel-image {
-    height: 300px;
+
+  .home-carousel-item,
+  .home-carousel-image {
+    height: 220px;
   }
 }
 
@@ -221,7 +214,8 @@ body {
   background-color: var(--color-pink-purple) !important;
 }
 
-.carousel-control-prev, .carousel-control-next {
+.carousel-control-prev,
+.carousel-control-next {
   width: 5%;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -232,8 +226,9 @@ body {
   opacity: 0.8;
 }
 
-.carousel-control-prev-icon, .carousel-control-next-icon {
-  background-color: rgba(0,0,0,0.3);
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.3);
   border-radius: 50%;
   padding: 20px;
   background-size: 50%;
@@ -244,7 +239,7 @@ body {
   background: #FFFFFF !important;
   border: none !important;
   border-radius: 12px !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
   transition: all var(--transition) !important;
   height: 100%;
   display: flex;
@@ -254,7 +249,7 @@ body {
 
 .product-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 .product-card img {
@@ -324,20 +319,25 @@ body {
 
 .product-card-button:hover {
   filter: brightness(1.1);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .category-image {
-  width: 80px;
-  height: 80px;
+  width: 110px;
+  height: 110px;
   object-fit: cover;
-  border: 2px solid var(--color-pink-purple);
-  padding: 3px;
-  transition: transform var(--transition);
+  background: #fafafa;
+  border: 3px solid #f0f0f0;
+  padding: 8px;
+  transition: all var(--transition);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
 }
 
 .category-image:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  border-color: var(--color-pink-purple);
+  box-shadow: 0 6px 20px rgba(255, 0, 128, 0.15);
 }
 
 /* ---------- Footer Redesign ---------- */
@@ -347,7 +347,7 @@ footer.bg-light {
   padding: 60px 0 30px !important;
   margin: 0;
   border: none;
-  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
 }
 
 footer.bg-light h5 {
@@ -358,8 +358,9 @@ footer.bg-light h5 {
   letter-spacing: 0.5px;
 }
 
-footer.bg-light a, footer.bg-light p {
-  color: rgba(255,255,255,0.9) !important;
+footer.bg-light a,
+footer.bg-light p {
+  color: rgba(255, 255, 255, 0.9) !important;
   text-decoration: none !important;
   font-size: 14px;
   transition: color var(--transition);
@@ -389,6 +390,115 @@ footer.bg-light a:hover {
 }
 
 .auth-links {
-    font-size: 13px;
-    font-weight: 400;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* ---------- Cart Icon ---------- */
+.nav-icons a {
+  color: #FFFFFF !important;
+  transition: opacity var(--transition);
+}
+
+.nav-icons a:hover {
+  opacity: 0.8;
+}
+
+/* ---------- Auth Forms (Login / Register) ---------- */
+.cardLogin.card-container {
+  max-width: 420px;
+  margin: 40px auto;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.cardLogin .profile-img-card {
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(255, 0, 128, 0.15);
+}
+
+.cardLogin h2 {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 28px;
+  color: #222;
+}
+
+.cardLogin .form-group {
+  margin-bottom: 18px;
+}
+
+.cardLogin .form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.cardLogin .form-control {
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  background: #fafafa;
+}
+
+.cardLogin .form-control:focus {
+  border-color: var(--color-pink-purple);
+  box-shadow: 0 0 0 3px rgba(255, 0, 128, 0.1);
+  background: #FFFFFF;
+  outline: none;
+}
+
+.cardLogin .btn-primary {
+  background: var(--color-pink-purple-gradient) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 28px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.3px;
+  transition: all var(--transition) !important;
+  box-shadow: 0 4px 15px rgba(255, 0, 128, 0.25) !important;
+}
+
+.cardLogin .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 0, 128, 0.35) !important;
+}
+
+.cardLogin .alert-danger {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 6px;
+  margin-bottom: 0;
+  border: none;
+  background: #fff0f0;
+  color: #d63031;
+}
+
+.cardLogin .alert-success {
+  font-size: 0.85rem;
+  border-radius: 8px;
+  border: none;
+  background: #f0fff4;
+  color: #00b894;
+}
+
+.cardLogin .alert-info {
+  font-size: 0.85rem;
+  border-radius: 8px;
+  border: none;
 }

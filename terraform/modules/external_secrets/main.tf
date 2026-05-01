@@ -118,29 +118,40 @@ resource "helm_release" "external_secrets" {
 # Shared ClusterSecretStore (aws-secretsmanager)
 # ──────────────────────────────────────────────
 
-resource "kubernetes_manifest" "cluster_secret_store" {
-  manifest = {
-    apiVersion = "external-secrets.io/v1beta1"
-    kind       = "ClusterSecretStore"
-    metadata = {
-      name = var.cluster_secret_store_name
-    }
-    spec = {
-      provider = {
-        aws = {
-          service = "SecretsManager"
-          region  = var.aws_region
-          auth = {
-            jwt = {
-              serviceAccountRef = {
-                name      = var.service_account_name
-                namespace = var.namespace
-              }
-            }
-          }
-        }
-      }
-    }
+resource "null_resource" "cluster_secret_store" {
+  triggers = {
+    cluster_secret_store_name = var.cluster_secret_store_name
+    namespace                 = var.namespace
+    service_account_name      = var.service_account_name
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      aws eks update-kubeconfig --region ${var.aws_region} --name ${var.cluster_name}
+
+      $yaml = @"
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: ${var.cluster_secret_store_name}
+spec:
+  provider:
+    aws:
+      service: SecretsManager
+      region: ${var.aws_region}
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: ${var.service_account_name}
+            namespace: ${var.namespace}
+"@
+
+      $tmpFile = [System.IO.Path]::GetTempFileName() + ".yaml"
+      $yaml | Out-File -FilePath $tmpFile -Encoding utf8
+      kubectl apply -f $tmpFile
+      Remove-Item $tmpFile
+    EOT
+    interpreter = ["powershell", "-Command"]
   }
 
   depends_on = [helm_release.external_secrets]
