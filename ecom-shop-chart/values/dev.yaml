@@ -51,7 +51,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/user-service
-      tag: develop-105ae17
+      tag: develop-83496af
       pullPolicy: Always
     containerPort: 5865
     service:
@@ -121,7 +121,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/product-service
-      tag: develop-105ae17
+      tag: develop-83496af
       pullPolicy: Always
     containerPort: 5861
     service:
@@ -191,7 +191,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/shopping-cart-service
-      tag: develop-105ae17
+      tag: develop-83496af
       pullPolicy: Always
     containerPort: 5863
     service:
