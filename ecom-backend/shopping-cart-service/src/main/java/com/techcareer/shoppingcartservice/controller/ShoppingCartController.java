@@ -21,7 +21,7 @@ import com.techcareer.shoppingcartservice.service.ShoppingCartService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api/shopping-cart")
 public class ShoppingCartController {
 
 	@Autowired
