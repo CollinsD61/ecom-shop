@@ -72,9 +72,9 @@ jobs:
       - name: Build production bundle
         run: npm run build
         env:
-          REACT_APP_USER_API_URL: ${{ env.API_URL }}/user
-          REACT_APP_PRODUCT_API_URL: ${{ env.API_URL }}/product
-          REACT_APP_CART_API_URL: ${{ env.API_URL }}/shopping-cart
+          REACT_APP_USER_API_URL: ${{ env.API_URL }}/user/
+          REACT_APP_PRODUCT_API_URL: ${{ env.API_URL }}/product/
+          REACT_APP_CART_API_URL: ${{ env.API_URL }}/shopping-cart/
           REACT_APP_BUILD_ID: ${{ github.sha }}
 
       # --- AWS credentials ---
