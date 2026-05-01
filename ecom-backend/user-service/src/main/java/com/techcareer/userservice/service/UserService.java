@@ -57,7 +57,7 @@ public class UserService {
                     .body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        // Create new user account with local database storage
+        // Create new user account with local database storage (no Cognito)
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 signUpRequest.getPassword());
