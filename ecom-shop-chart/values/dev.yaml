@@ -51,7 +51,7 @@ services:
     replicaCount: 1
     image:
       repository: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com/user-service
-      tag: develop-f72251b
+      tag: develop-8f6325b
       pullPolicy: Always
     containerPort: 5865
     service:
