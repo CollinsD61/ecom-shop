@@ -23,7 +23,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(originPatterns = {
+		"http://localhost:5173",
+		"https://shop.dohoangdevops.io.vn"
+},
+	maxAge = 3600,
+	allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/api/user")
 @Tag(name = "user", description = "User Endpoints")
@@ -31,7 +37,7 @@ public class UserController {
 
 	@Autowired
 	UserService userService;
-
+	//test
 	@PostMapping("/signin")
 	@Operation(summary = "Authenticate user", description = "Login with username and password")
 	@ApiResponses(value = {
