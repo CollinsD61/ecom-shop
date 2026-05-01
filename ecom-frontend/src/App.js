@@ -76,6 +76,9 @@ class App extends Component {
         <div className="header-container">
           {/* Header Top */}
           <div className="header-top">
+            <div className="header-top-left">
+              Ưu đãi hôm nay: Miễn phí ship đơn từ 299K
+            </div>
             <div className="header-top-right">
               <button style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><Notifications /></button>
               <button style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><Help /></button>
@@ -104,7 +107,7 @@ class App extends Component {
                   alt="Logo"
                   className="logo-image"
                 />
-                <span className="logo-text">Ecom-Shop1234</span>
+                <span className="logo-text">Ecom-Shop</span>
               </Navbar.Brand>
 
               {/* Search Container */}
@@ -164,7 +167,7 @@ class App extends Component {
         {/* Footer Unified Purple */}
         <footer className="bg-light">
           <Container>
-            <Row className="g-4" style={{ display: 'flex', flexWrap: 'wrap' }}>
+            <Row className="g-4">
               <Col lg={3} md={6}>
                 <h5>CHĂM SÓC KHÁCH HÀNG</h5>
                 <ul className="list-unstyled">
@@ -188,18 +191,20 @@ class App extends Component {
               <Col lg={3} md={6}>
                 <h5>THEO DÕI CHÚNG TÔI</h5>
                 <ul className="list-unstyled">
-                  <li><a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a></li>
-                  <li><a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a></li>
-                  <li><a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a></li>
+                  <li><a href="https://facebook.com" target="_blank" rel="noreferrer"><Facebook fontSize="small" style={{ marginRight: '8px' }} /> Facebook</a></li>
+                  <li><a href="https://instagram.com" target="_blank" rel="noreferrer"><Instagram fontSize="small" style={{ marginRight: '8px' }} /> Instagram</a></li>
+                  <li><a href="https://youtube.com" target="_blank" rel="noreferrer"><YouTube fontSize="small" style={{ marginRight: '8px' }} /> YouTube</a></li>
                 </ul>
               </Col>
 
               <Col lg={3} md={6}>
                 <h5>LIÊN HỆ</h5>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <Email fontSize="small" /> 
                   <span style={{ fontSize: '14px' }}>support@ecom-shop.devops.io.vn</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                  <Phone fontSize="small" /> 
                   <span style={{ fontSize: '14px' }}>+84 123 456 789</span>
                 </div>
                 <div className="payment-icons">
@@ -216,7 +221,6 @@ class App extends Component {
             </p>
           </Container>
         </footer>
-
         <ToastContainer />
         <AuthVerify logOut={this.logOut} />
       </>
