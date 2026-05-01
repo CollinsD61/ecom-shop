@@ -77,7 +77,7 @@ class App extends Component {
           {/* Header Top */}
           <div className="header-top">
             <div className="header-top-left">
-              Ưu đãi hôm nay: Miễn phí ship đơn từ 299K
+
             </div>
             <div className="header-top-right">
               <button style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}><Notifications /></button>
@@ -200,11 +200,11 @@ class App extends Component {
               <Col lg={3} md={6}>
                 <h5>LIÊN HỆ</h5>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <Email fontSize="small" /> 
+                  <Email fontSize="small" />
                   <span style={{ fontSize: '14px' }}>support@ecom-shop.devops.io.vn</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                  <Phone fontSize="small" /> 
+                  <Phone fontSize="small" />
                   <span style={{ fontSize: '14px' }}>+84 123 456 789</span>
                 </div>
                 <div className="payment-icons">
