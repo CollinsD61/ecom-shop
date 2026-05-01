@@ -4,6 +4,8 @@
 nameOverride: ""
 fullnameOverride: ""
 
+revisionHistoryLimit: 3
+
 imagePullSecrets: []
 
 # External Secrets Operator integration for AWS Secrets Manager
