@@ -96,7 +96,7 @@ class App extends Component {
 
           {/* Navbar */}
           <Navbar expand="lg" className="navbar" variant="light">
-            <Container fluid>
+            <Container fluid style={{ padding: '0 60px', display: 'flex', alignItems: 'flex-start' }}>
               {/* Logo combined with text */}
               <Navbar.Brand as={Link} to="/" className="logo-container">
                 <img
@@ -107,30 +107,43 @@ class App extends Component {
                 <span className="logo-text">Ecom-Shop1234</span>
               </Navbar.Brand>
 
-              {/* Thanh tìm kiếm */}
-              <Form className="search-form">
-                <FormControl
-                  type="search"
-                  placeholder="Ecom-Shop bao ship 0đ - Đăng ký ngay!"
-                  aria-label="Search"
-                />
-                <Button className="search-button">
-                  <Search />
-                </Button>
-              </Form>
+              {/* Search Container */}
+              <div className="search-container-shopee">
+                <Form className="search-form">
+                  <FormControl
+                    type="search"
+                    placeholder="Ecom-Shop bao ship 0đ - Đăng ký ngay!"
+                    aria-label="Search"
+                  />
+                  <Button className="search-button">
+                    <Search />
+                  </Button>
+                </Form>
+                {/* Keywords gợi ý */}
+                <div className="search-keywords">
+                  <Link to="/">Dép</Link>
+                  <Link to="/">Áo Phông</Link>
+                  <Link to="/">Túi Xách</Link>
+                  <Link to="/">Váy</Link>
+                  <Link to="/">Ốp Điện Thoại</Link>
+                  <Link to="/">Tai Nghe</Link>
+                  <Link to="/">Mỹ Phẩm</Link>
+                  <Link to="/">Giày Nam</Link>
+                </div>
+              </div>
 
               {/* Biểu tượng giỏ hàng */}
               <div className="nav-icons">
-                <a href="/cart">
-                  <ShoppingCart />
-                </a>
+                <Link to="/cart" title="Giỏ hàng">
+                  <ShoppingCart style={{ fontSize: '30px' }} />
+                </Link>
               </div>
             </Container>
           </Navbar>
         </div>
 
         {/* Nội dung trang */}
-        <div className="container mt-3">
+        <div className="container mt-4 mb-5" style={{ minHeight: '65vh' }}>
           <Routes>
             <Route path="/" element={<HomeComponent />} />
             <Route path="/login" element={<LoginComponent />} />
@@ -147,6 +160,63 @@ class App extends Component {
             )}
           </Routes>
         </div>
+
+        {/* Footer Unified Purple */}
+        <footer className="bg-light">
+          <Container>
+            <Row className="g-4" style={{ display: 'flex', flexWrap: 'wrap' }}>
+              <Col lg={3} md={6}>
+                <h5>CHĂM SÓC KHÁCH HÀNG</h5>
+                <ul className="list-unstyled">
+                  <li><Link to="/">Trung Tâm Trợ Giúp</Link></li>
+                  <li><Link to="/">Ecom-Shop Blog</Link></li>
+                  <li><Link to="/">Ecom-Shop Mall</Link></li>
+                  <li><Link to="/">Hướng Dẫn Mua Hàng</Link></li>
+                </ul>
+              </Col>
+
+              <Col lg={3} md={6}>
+                <h5>VỀ ECOM-SHOP</h5>
+                <ul className="list-unstyled">
+                  <li><Link to="/">Giới Thiệu Về Ecom-Shop</Link></li>
+                  <li><Link to="/">Tuyển Dụng</Link></li>
+                  <li><Link to="/">Điều Khoản Ecom-Shop</Link></li>
+                  <li><Link to="/">Chính Sách Bảo Mật</Link></li>
+                </ul>
+              </Col>
+
+              <Col lg={3} md={6}>
+                <h5>THEO DÕI CHÚNG TÔI</h5>
+                <ul className="list-unstyled">
+                  <li><a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a></li>
+                  <li><a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a></li>
+                  <li><a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a></li>
+                </ul>
+              </Col>
+
+              <Col lg={3} md={6}>
+                <h5>LIÊN HỆ</h5>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '14px' }}>support@ecom-shop.devops.io.vn</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                  <span style={{ fontSize: '14px' }}>+84 123 456 789</span>
+                </div>
+                <div className="payment-icons">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" />
+                  <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style={{ filter: 'brightness(0) invert(1)' }} />
+                </div>
+              </Col>
+            </Row>
+            <hr style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+            <p className="text-center mb-0" style={{ fontSize: '12px', opacity: 0.8 }}>
+              &copy; {new Date().getFullYear()} Ecom-Shop. Tất cả các quyền được bảo lưu.
+            </p>
+          </Container>
+        </footer>
+
         <ToastContainer />
         <AuthVerify logOut={this.logOut} />
       </>
