@@ -107,7 +107,7 @@ class App extends Component {
                   alt="Logo"
                   className="logo-image"
                 />
-                <span className="logo-text">Ecom-Shop1234</span>
+                <span className="logo-text">Ecom-Shop</span>
               </Navbar.Brand>
 
               {/* Search Container */}
