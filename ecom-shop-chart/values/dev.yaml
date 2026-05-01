@@ -86,7 +86,7 @@ services:
       initialDelaySeconds: 10
       periodSeconds: 10
     autoscaling:
-      enabled: false
+      enabled: true
       minReplicas: 2
       maxReplicas: 5
       targetCPUUtilizationPercentage: 75
@@ -156,7 +156,7 @@ services:
       initialDelaySeconds: 10
       periodSeconds: 10
     autoscaling:
-      enabled: false
+      enabled: true
       minReplicas: 2
       maxReplicas: 5
       targetCPUUtilizationPercentage: 75
@@ -226,7 +226,7 @@ services:
       initialDelaySeconds: 10
       periodSeconds: 10
     autoscaling:
-      enabled: false
+      enabled: true
       minReplicas: 2
       maxReplicas: 5
       targetCPUUtilizationPercentage: 75

@@ -141,6 +141,11 @@ variable "domain_name" {
   default = "dohoangdevops.io.vn"
 }
 
+variable "datadog_api_key" {
+  type      = string
+  sensitive = true
+}
+
 # ──────────────────────────────────────────────
 # Providers
 # ──────────────────────────────────────────────
@@ -373,6 +378,20 @@ module "irsa_shopping_cart_service" {
     module.secrets.service_db_secret_arns["shopping-cart-service"],
     module.secrets.shared_rds_secret_arn,
   ]
+}
+
+# ──────────────────────────────────────────────
+# Module: Datadog
+# ──────────────────────────────────────────────
+
+module "datadog" {
+  count = var.skip_k8s_addons ? 0 : 1
+
+  source = "../../modules/datadog"
+
+  env             = var.env
+  cluster_name    = module.eks.cluster_name
+  datadog_api_key = var.datadog_api_key
 }
 
 
