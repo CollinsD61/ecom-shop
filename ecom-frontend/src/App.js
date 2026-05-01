@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import { Container, Navbar, Form, FormControl, Button } from "react-bootstrap";
-import { Search, ShoppingCart, Notifications, Help, Language } from "@mui/icons-material";
+import { Container, Navbar, Form, FormControl, Button, Row, Col } from "react-bootstrap";
+import { Search, ShoppingCart, Notifications, Help, Language, Facebook, YouTube, Email, Phone, Instagram, AccountCircle } from "@mui/icons-material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
