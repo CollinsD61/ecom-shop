@@ -19,7 +19,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 env:
   AWS_REGION: ap-southeast-1
@@ -155,3 +155,47 @@ jobs:
           echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Image | \`${{ steps.meta.outputs.image }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Tags | \`${{ steps.meta.outputs.tag_prefix }}${{ steps.meta.outputs.short_sha }}\`, \`${{ steps.meta.outputs.tag_prefix }}latest\` |" >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Update Manifest (GitOps)
+  # ---------------------------------------------------------------------------
+  update-manifest:
+    name: Update Helm Manifest
+    needs: [changes, build-and-push]
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.services != '[]'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Image Tags in values file
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BRANCH="${GITHUB_REF_NAME}"
+          
+          if [ "$BRANCH" = "main" ]; then
+            TAG_PREFIX=""
+            VALUES_FILE="ecom-shop-chart/values/prod.yaml"
+          else
+            TAG_PREFIX="${BRANCH}-"
+            VALUES_FILE="ecom-shop-chart/values/dev.yaml"
+          fi
+
+          # Install yq for YAML manipulation
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
+
+          # Update each service that was built
+          SERVICES='${{ needs.changes.outputs.services }}'
+          for service in $(echo $SERVICES | jq -r '.[]'); do
+            echo "Updating $service tag to ${TAG_PREFIX}${SHORT_SHA} in $VALUES_FILE"
+            yq -i ".services.${service}.image.tag = \"${TAG_PREFIX}${SHORT_SHA}\"" $VALUES_FILE
+          done
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: update backend image tags to ${GITHUB_SHA::7} [skip ci]" || echo "No changes to commit"
+          git push
