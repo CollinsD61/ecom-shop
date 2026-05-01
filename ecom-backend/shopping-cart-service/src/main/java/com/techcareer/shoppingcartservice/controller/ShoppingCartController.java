@@ -19,7 +19,7 @@ import com.techcareer.shoppingcartservice.entity.Product;
 import com.techcareer.shoppingcartservice.entity.ShoppingCart;
 import com.techcareer.shoppingcartservice.service.ShoppingCartService;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/shopping-cart")
 public class ShoppingCartController {

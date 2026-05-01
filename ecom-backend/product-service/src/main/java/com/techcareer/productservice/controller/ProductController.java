@@ -20,7 +20,7 @@ import com.techcareer.productservice.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/product")
 @Tag(name = "product", description = "Product Endpoints")
