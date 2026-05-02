@@ -74,11 +74,11 @@ services:
       - user-service-secret-dev
     resources:
       requests:
-        cpu: "100m"
-        memory: "128Mi"
+        cpu: "50m"
+        memory: "64Mi"
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: "300m"
+        memory: "256Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
@@ -93,8 +93,8 @@ services:
       periodSeconds: 10
     autoscaling:
       enabled: true
-      minReplicas: 2
-      maxReplicas: 5
+      minReplicas: 1
+      maxReplicas: 3
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 80
     volumes: []
@@ -150,11 +150,11 @@ services:
       - product-service-secret-dev
     resources:
       requests:
-        cpu: "100m"
-        memory: "128Mi"
+        cpu: "50m"
+        memory: "64Mi"
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: "300m"
+        memory: "256Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
@@ -169,8 +169,8 @@ services:
       periodSeconds: 10
     autoscaling:
       enabled: true
-      minReplicas: 2
-      maxReplicas: 5
+      minReplicas: 1
+      maxReplicas: 3
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 80
     volumes: []
@@ -226,11 +226,11 @@ services:
       - shopping-cart-service-secret-dev
     resources:
       requests:
-        cpu: "100m"
-        memory: "128Mi"
+        cpu: "50m"
+        memory: "64Mi"
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: "300m"
+        memory: "256Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
@@ -245,8 +245,8 @@ services:
       periodSeconds: 10
     autoscaling:
       enabled: true
-      minReplicas: 2
-      maxReplicas: 5
+      minReplicas: 1
+      maxReplicas: 3
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 80
     volumes: []
