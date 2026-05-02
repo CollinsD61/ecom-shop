@@ -74,22 +74,22 @@ services:
       - user-service-secret-dev
     resources:
       requests:
-        cpu: "50m"
-        memory: "64Mi"
+        cpu: "200m"
+        memory: "128Mi"
       limits:
-        cpu: "300m"
-        memory: "256Mi"
+        cpu: "500m"
+        memory: "512Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
         port: http
-      initialDelaySeconds: 60
+      initialDelaySeconds: 180
       periodSeconds: 15
     readinessProbe:
       httpGet:
         path: /actuator/health
         port: http
-      initialDelaySeconds: 40
+      initialDelaySeconds: 120
       periodSeconds: 10
     autoscaling:
       enabled: true
@@ -150,22 +150,22 @@ services:
       - product-service-secret-dev
     resources:
       requests:
-        cpu: "50m"
-        memory: "64Mi"
+        cpu: "200m"
+        memory: "128Mi"
       limits:
-        cpu: "300m"
-        memory: "256Mi"
+        cpu: "500m"
+        memory: "512Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
         port: http
-      initialDelaySeconds: 60
+      initialDelaySeconds: 180
       periodSeconds: 15
     readinessProbe:
       httpGet:
         path: /actuator/health
         port: http
-      initialDelaySeconds: 40
+      initialDelaySeconds: 120
       periodSeconds: 10
     autoscaling:
       enabled: true
@@ -226,22 +226,22 @@ services:
       - shopping-cart-service-secret-dev
     resources:
       requests:
-        cpu: "50m"
-        memory: "64Mi"
+        cpu: "200m"
+        memory: "128Mi"
       limits:
-        cpu: "300m"
-        memory: "256Mi"
+        cpu: "500m"
+        memory: "512Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
         port: http
-      initialDelaySeconds: 60
+      initialDelaySeconds: 180
       periodSeconds: 15
     readinessProbe:
       httpGet:
         path: /actuator/health
         port: http
-      initialDelaySeconds: 40
+      initialDelaySeconds: 120
       periodSeconds: 10
     autoscaling:
       enabled: true
