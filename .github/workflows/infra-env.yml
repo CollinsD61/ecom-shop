@@ -1,7 +1,7 @@
 # =============================================================================
 # 6. Infra CI/CD Environment — Terraform dev/prod
 # =============================================================================
-# Pham vi: VPC/EKS/RDS/Cognito/IRSA theo moi truong
+# Pham vi: VPC/EKS/RDS/IRSA theo moi truong
 # Trigger: dev co the auto, prod bat buoc manual approval
 # Muc tieu: kiem soat chat thay doi ha tang, dac biet prod
 # =============================================================================

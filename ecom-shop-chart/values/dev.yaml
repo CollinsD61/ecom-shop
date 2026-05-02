@@ -72,7 +72,13 @@ services:
         value: dev
     envFromSecrets:
       - user-service-secret-dev
-    resources: {}
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
@@ -142,7 +148,13 @@ services:
         value: dev
     envFromSecrets:
       - product-service-secret-dev
-    resources: {}
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health
@@ -212,7 +224,13 @@ services:
         value: dev
     envFromSecrets:
       - shopping-cart-service-secret-dev
-    resources: {}
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
     livenessProbe:
       httpGet:
         path: /actuator/health

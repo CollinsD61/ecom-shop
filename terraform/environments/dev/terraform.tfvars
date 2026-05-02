@@ -32,3 +32,8 @@ db_skip_final_snapshot     = true
 # Domain
 domain_name = "dohoangdevops.io.vn"
 
+# k6 Runner
+k6_enabled          = true
+k6_instance_type    = "t3.small"
+k6_key_name         = "dev-k6-runner-key"
+k6_allowed_ssh_cidr = ["0.0.0.0/0"]

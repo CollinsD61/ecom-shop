@@ -146,6 +146,31 @@ variable "datadog_api_key" {
   sensitive = true
 }
 
+# k6 runner
+variable "k6_enabled" {
+  type        = bool
+  description = "Bat/tat k6 runner EC2 (chi can trong dev, test)"
+  default     = false
+}
+
+variable "k6_instance_type" {
+  type        = string
+  description = "EC2 instance type cho k6 runner"
+  default     = "t3.small"
+}
+
+variable "k6_key_name" {
+  type        = string
+  description = "Ten EC2 Key Pair de SSH truc tiep vao k6 runner"
+  default     = ""
+}
+
+variable "k6_allowed_ssh_cidr" {
+  type        = list(string)
+  description = "CIDRs duoc phep SSH vao k6 runner (e.g. \"1.2.3.4/32\")"
+  default     = ["0.0.0.0/0"]
+}
+
 # ──────────────────────────────────────────────
 # Providers
 # ──────────────────────────────────────────────
@@ -394,4 +419,60 @@ module "datadog" {
   datadog_api_key = var.datadog_api_key
 }
 
+# ──────────────────────────────────────────────
+# Module: Metrics Server
+# ──────────────────────────────────────────────
+# Can thiet cho kubectl top + HPA hoat dong dung
 
+module "metrics_server" {
+  count = var.skip_k8s_addons ? 0 : 1
+
+  source = "../../modules/metrics_server"
+
+  depends_on = [module.eks]
+}
+
+# ──────────────────────────────────────────────
+# Module: k6 Runner EC2
+# ──────────────────────────────────────────────
+# EC2 nam trong public subnet, cai san k6.
+# Bat len khi can spike test: k6_enabled = true
+# Ket noi bang: aws ssm start-session --target <instance-id>
+
+module "k6_runner" {
+  count = var.k6_enabled ? 1 : 0
+
+  source = "../../modules/k6_runner"
+
+  env                 = var.env
+  vpc_id              = module.vpc.vpc_id
+  subnet_id           = module.vpc.public_subnet_ids[0]
+  instance_type       = var.k6_instance_type
+  key_name            = var.k6_key_name
+  allowed_ssh_cidr    = var.k6_allowed_ssh_cidr
+  associate_public_ip = true
+}
+
+# ──────────────────────────────────────────────
+# Outputs: k6 runner
+# ──────────────────────────────────────────────
+
+output "k6_runner_instance_id" {
+  description = "EC2 instance ID cua k6 runner"
+  value       = var.k6_enabled ? module.k6_runner[0].instance_id : "k6 disabled"
+}
+
+output "k6_runner_public_ip" {
+  description = "Public IP de SSH vao k6 runner"
+  value       = var.k6_enabled ? module.k6_runner[0].public_ip : "k6 disabled"
+}
+
+output "k6_runner_private_ip" {
+  description = "Private IP cua k6 runner"
+  value       = var.k6_enabled ? module.k6_runner[0].private_ip : "k6 disabled"
+}
+
+output "k6_runner_ssm_command" {
+  description = "Lenh ket noi vao k6 runner qua SSM (khong can key)"
+  value       = var.k6_enabled ? module.k6_runner[0].ssm_connect_command : "k6 disabled"
+}
