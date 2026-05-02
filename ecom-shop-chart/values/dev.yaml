@@ -94,7 +94,7 @@ services:
     autoscaling:
       enabled: true
       minReplicas: 1
-      maxReplicas: 1
+      maxReplicas: 3
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 80
     volumes: []
@@ -170,7 +170,7 @@ services:
     autoscaling:
       enabled: true
       minReplicas: 1
-      maxReplicas: 1
+      maxReplicas: 3
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 80
     volumes: []
@@ -246,7 +246,7 @@ services:
     autoscaling:
       enabled: true
       minReplicas: 1
-      maxReplicas: 1
+      maxReplicas: 3
       targetCPUUtilizationPercentage: 75
       targetMemoryUtilizationPercentage: 80
     volumes: []
