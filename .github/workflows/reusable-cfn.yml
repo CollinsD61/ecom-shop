@@ -1,0 +1,59 @@
+name: "Reusable CloudFormation CI"
+
+on:
+  workflow_call:
+    inputs:
+      template-path:
+        description: "Path to the CloudFormation template to lint"
+        required: true
+        type: string
+      taskcat-config-dir:
+        description: "Directory containing the .taskcat.yml file"
+        required: false
+        type: string
+        default: "cloudformation"
+      python-version:
+        description: "Python version to use"
+        required: false
+        type: string
+        default: "3.9"
+
+jobs:
+  validate:
+    name: CloudFormation Lint & Taskcat Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Install Linting and Testing Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install cfn-lint taskcat
+
+      - name: Run cfn-lint
+        run: |
+          echo "Running cfn-lint on ${{ inputs.template-path }}..."
+          cfn-lint ${{ inputs.template-path }}
+
+      - name: Run Taskcat Lint & Test
+        run: |
+          echo "Running Taskcat lint..."
+          # Taskcat needs configuration in taskcat-config-dir
+          cd ${{ inputs.taskcat-config-dir }}
+          taskcat lint
+          
+          # Since 'taskcat test run' requires active AWS credentials, we check if AWS credentials are provided.
+          # If they are, we run the test, otherwise we just output a warning and soft-fail or skip to prevent build failure.
+          if [ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+            echo "AWS Credentials detected, running taskcat test run..."
+            taskcat test run
+          else
+            echo "::warning::AWS Credentials are not set. Skipping active taskcat integration tests. Syntax check only."
+          fi

@@ -1,0 +1,53 @@
+name: "Reusable Terraform CI"
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "The directory where Terraform files are located"
+        required: true
+        type: string
+      terraform-version:
+        description: "Version of Terraform to use"
+        required: false
+        type: string
+        default: "1.5.0"
+      run-checkov:
+        description: "Whether to run Checkov security scan"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  validate:
+    name: Terraform Validate & Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Run Checkov Security Scan
+        if: ${{ inputs.run-checkov }}
+        uses: bridgecrewio/checkov-action@master
+        with:
+          framework: terraform
+          directory: ${{ inputs.working-directory }}
+          output_format: cli
+          soft_fail: true # Set to true to show warnings without failing the entire build

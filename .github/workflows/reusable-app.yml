@@ -1,0 +1,211 @@
+name: "Reusable Microservice CI/CD"
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        description: "Name of the service (e.g. user-service)"
+        required: true
+        type: string
+      service-type:
+        description: "Type of service: maven or node"
+        required: true
+        type: string
+      working-directory:
+        description: "Directory path of the service"
+        required: true
+        type: string
+      docker-context:
+        description: "Docker build context directory"
+        required: false
+        type: string
+      dockerfile-path:
+        description: "Path to Dockerfile inside context"
+        required: false
+        type: string
+        default: "Dockerfile"
+      run-deploy:
+        description: "Whether to update Helm values file for GitOps deploy"
+        required: false
+        type: boolean
+        default: false
+      values-file-path:
+        description: "Path to Helm values yaml file to update"
+        required: false
+        type: string
+    secrets:
+      SONAR_TOKEN:
+        required: false
+      SONAR_HOST_URL:
+        required: false
+      AWS_ACCESS_KEY_ID:
+        required: false
+      AWS_SECRET_ACCESS_KEY:
+        required: false
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REGISTRY: 879381260173.dkr.ecr.ap-southeast-1.amazonaws.com
+
+jobs:
+  ci-cd:
+    name: Build, Scan & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # =========================================================================
+      # 1. SETUP & TESTING STAGE
+      # =========================================================================
+      
+      # --- Maven Configuration ---
+      - name: Set up JDK 17 (Maven)
+        if: ${{ inputs.service-type == 'maven' }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: maven
+
+      - name: Run Maven Tests
+        if: ${{ inputs.service-type == 'maven' }}
+        run: |
+          cd ${{ inputs.working-directory }}
+          ./mvnw test -B -q
+
+      # --- Node Configuration ---
+      - name: Set up Node.js (Node)
+        if: ${{ inputs.service-type == 'node' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: npm
+          cache-dependency-path: "${{ inputs.working-directory }}/package-lock.json"
+
+      - name: Install Node Dependencies & Test
+        if: ${{ inputs.service-type == 'node' }}
+        run: |
+          cd ${{ inputs.working-directory }}
+          npm ci
+          npm test -- --watchAll=false --passWithNoTests
+        env:
+          CI: true
+
+      # =========================================================================
+      # 2. SONARQUBE QUALITY SCAN
+      # =========================================================================
+      - name: SonarQube Scan (Maven)
+        if: ${{ inputs.service-type == 'maven' && secrets.SONAR_TOKEN != '' }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          cd ${{ inputs.working-directory }}
+          ./mvnw sonar:sonar -Dsonar.projectKey=ecom-${{ inputs.service-name }} -Dsonar.projectName="Ecom ${{ inputs.service-name }}"
+
+      - name: SonarQube Scan (Node)
+        if: ${{ inputs.service-type == 'node' && secrets.SONAR_TOKEN != '' }}
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: ${{ inputs.working-directory }}
+          args: >
+            -Dsonar.projectKey=ecom-${{ inputs.service-name }}
+            -Dsonar.projectName="Ecom ${{ inputs.service-name }}"
+
+      # =========================================================================
+      # 3. TRIVY SECURITY SCAN (Filesystem)
+      # =========================================================================
+      - name: Run Trivy File System Security Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: ${{ inputs.working-directory }}
+          severity: CRITICAL,HIGH
+          exit-code: "0" # Do not break build on warnings, report them
+          format: table
+
+      # =========================================================================
+      # 4. DOCKER BUILD & PUSH STAGE
+      # =========================================================================
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # --- Configure AWS & Login ECR (Only if AWS Secrets are set) ---
+      - name: Configure AWS credentials
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Prepare Image Tags
+        id: meta
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BRANCH="${GITHUB_REF_NAME}"
+          
+          if [ "$BRANCH" = "main" ]; then
+            TAG_PREFIX=""
+          else
+            TAG_PREFIX="${BRANCH}-"
+          fi
+          
+          IMAGE="${ECR_REGISTRY}/${{ inputs.service-name }}"
+          TAGS="${IMAGE}:${TAG_PREFIX}${SHORT_SHA},${IMAGE}:${TAG_PREFIX}latest"
+          
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "tag_prefix=${TAG_PREFIX}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker Image (Locally or Push to ECR)
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.docker-context || inputs.working-directory }}
+          file: "${{ inputs.working-directory }}/${{ inputs.dockerfile-path }}"
+          push: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=${{ inputs.service-name }}
+          cache-to: type=gha,mode=max,scope=${{ inputs.service-name }}
+
+      # =========================================================================
+      # 5. GITOPS DEPLOY STAGE (Update manifest values)
+      # =========================================================================
+      - name: Update Helm Manifest (GitOps)
+        if: ${{ inputs.run-deploy && inputs.values-file-path != '' }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          TAG_PREFIX="${{ steps.meta.outputs.tag_prefix }}"
+          VALUES_FILE="${{ inputs.values-file-path }}"
+          
+          # Install yq
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
+          
+          # Update YAML
+          if [ "${{ inputs.service-name }}" = "ecom-frontend" ]; then
+            echo "Updating frontend tag to ${TAG_PREFIX}${SHORT_SHA} in $VALUES_FILE"
+          else
+            echo "Updating backend service ${{ inputs.service-name }} tag to ${TAG_PREFIX}${SHORT_SHA} in $VALUES_FILE"
+            yq -i ".services.${{ inputs.service-name }}.image.tag = \"${TAG_PREFIX}${SHORT_SHA}\"" $VALUES_FILE
+          fi
+          
+      - name: Commit and Push changes
+        if: ${{ inputs.run-deploy && inputs.values-file-path != '' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: update ${{ inputs.service-name }} image tag to ${GITHUB_SHA::7} [skip ci]" || echo "No changes to commit"
+          git push

@@ -1,0 +1,7 @@
+project:
+  name: ecom-shop-infra
+  regions:
+    - ap-southeast-1
+tests:
+  default:
+    template: aws-infra.yaml

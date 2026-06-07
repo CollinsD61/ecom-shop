@@ -32,6 +32,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       terraform: ${{ steps.filter.outputs.terraform }}
       helm: ${{ steps.filter.outputs.helm }}
+      cloudformation: ${{ steps.filter.outputs.cloudformation }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,6 +48,8 @@ jobs:
               - 'terraform/**'
             helm:
               - 'ecom-shop-chart/**'
+            cloudformation:
+              - 'cloudformation/**'
 
   # ---------------------------------------------------------------------------
   # Backend — lint + unit test (matrix 3 services)
@@ -118,30 +121,24 @@ jobs:
     name: "Terraform Validate [${{ matrix.env }}]"
     needs: changes
     if: needs.changes.outputs.terraform == 'true'
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         env: [shared, dev, prod]
-    defaults:
-      run:
-        working-directory: terraform/environments/${{ matrix.env }}
-    steps:
-      - uses: actions/checkout@v4
+    uses: ./.github/workflows/reusable-tf.yml
+    with:
+      working-directory: terraform/environments/${{ matrix.env }}
+      terraform-version: "1.5"
+      run-checkov: true
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.5"
-
-      - name: Terraform fmt
-        run: terraform fmt -check -recursive ../../
-
-      - name: Terraform init (backend=false)
-        run: terraform init -backend=false
-
-      - name: Terraform validate
-        run: terraform validate
+  cloudformation-validate:
+    name: CloudFormation Validate
+    needs: changes
+    if: needs.changes.outputs.cloudformation == 'true'
+    uses: ./.github/workflows/reusable-cfn.yml
+    with:
+      template-path: cloudformation/aws-infra.yaml
+      taskcat-config-dir: cloudformation
 
   # ---------------------------------------------------------------------------
   # Helm — lint chart
@@ -193,6 +190,7 @@ jobs:
       - backend-validate
       - frontend-validate
       - terraform-validate
+      - cloudformation-validate
       - helm-validate
       - security-scan
     runs-on: ubuntu-latest
@@ -202,6 +200,7 @@ jobs:
           echo "Backend:    ${{ needs.backend-validate.result }}"
           echo "Frontend:   ${{ needs.frontend-validate.result }}"
           echo "Terraform:  ${{ needs.terraform-validate.result }}"
+          echo "CloudFormation: ${{ needs.cloudformation-validate.result }}"
           echo "Helm:       ${{ needs.helm-validate.result }}"
           echo "Security:   ${{ needs.security-scan.result }}"
 
@@ -209,6 +208,7 @@ jobs:
           if [[ "${{ needs.backend-validate.result }}" == "failure" ]] || \
              [[ "${{ needs.frontend-validate.result }}" == "failure" ]] || \
              [[ "${{ needs.terraform-validate.result }}" == "failure" ]] || \
+             [[ "${{ needs.cloudformation-validate.result }}" == "failure" ]] || \
              [[ "${{ needs.helm-validate.result }}" == "failure" ]] || \
              [[ "${{ needs.security-scan.result }}" == "failure" ]]; then
             echo "::error::One or more checks failed"
